@@ -35,6 +35,12 @@ SET(CXX_FLAGS_LIST
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS${buildType}} /nologo")
   add_definitions(-D_WIN32_WINNT=0x600)
 
+find_program(CONAN_PROGRAM "conan")
+IF (NOT CONAN_PROGRAM)
+    execute_process (
+        COMMAND pip install conan
+    )
+ENDIF()
 
 # Setup conan
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
