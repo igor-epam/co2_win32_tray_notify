@@ -13,10 +13,10 @@
 
 #define MQTT_ALWAYS_INLINE
 
-#else // GCC or Clang
+#else  // GCC or Clang
 
 #define MQTT_ALWAYS_INLINE [[gnu::always_inline]]
 
-#endif // _MSC_VER
+#endif  // _MSC_VER
 
-#endif // MQTT_ATTRIBUTES_HPP
+#endif  // MQTT_ATTRIBUTES_HPP

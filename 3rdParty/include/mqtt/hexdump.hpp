@@ -7,10 +7,9 @@
 #if !defined(MQTT_HEXDUMP_HPP)
 #define MQTT_HEXDUMP_HPP
 
-#include <ostream>
 #include <iomanip>
-
 #include <mqtt/namespace.hpp>
+#include <ostream>
 
 namespace MQTT_NS {
 
@@ -22,6 +21,6 @@ inline void hexdump(std::ostream& os, T const& v) {
     }
 }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_HEXDUMP_HPP
+#endif  // MQTT_HEXDUMP_HPP

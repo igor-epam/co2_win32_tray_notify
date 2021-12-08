@@ -7,14 +7,13 @@
 #if !defined(MQTT_TIME_POINT_T_HPP)
 #define MQTT_TIME_POINT_T_HPP
 
-#include <mqtt/config.hpp>
-
 #include <chrono>
+#include <mqtt/config.hpp>
 
 namespace MQTT_NS {
 
 using time_point_t = std::chrono::time_point<std::chrono::steady_clock>;
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_TIME_POINT_T_HPP
+#endif  // MQTT_TIME_POINT_T_HPP

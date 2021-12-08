@@ -11,32 +11,30 @@
 
 #if !defined(MQTT_TLS_INCLUDE)
 #define MQTT_TLS_INCLUDE <boost/asio/ssl.hpp>
-#endif // !defined(MQTT_TLS_INCLUDE)
+#endif  // !defined(MQTT_TLS_INCLUDE)
 
 #include MQTT_TLS_INCLUDE
 
 #if !defined(MQTT_TLS_NS)
 #define MQTT_TLS_NS boost::asio::ssl
-#endif // !defined(MQTT_TLS_NS)
+#endif  // !defined(MQTT_TLS_NS)
 
 #include <mqtt/namespace.hpp>
 
 namespace MQTT_NS {
 namespace tls = MQTT_TLS_NS;
-} // namespace MQTT_NS
-
+}  // namespace MQTT_NS
 
 #if defined(MQTT_USE_WS)
 
 #if !defined(MQTT_TLS_WS_INCLUDE)
 #define MQTT_TLS_WS_INCLUDE <boost/beast/websocket/ssl.hpp>
-#endif // !defined(MQTT_TLS_WS_INCLUDE)
+#endif  // !defined(MQTT_TLS_WS_INCLUDE)
 
 #include MQTT_TLS_WS_INCLUDE
 
-#endif // defined(MQTT_USE_WS)
+#endif  // defined(MQTT_USE_WS)
 
-#endif // defined(MQTT_USE_TLS)
+#endif  // defined(MQTT_USE_TLS)
 
-
-#endif // MQTT_TLS_HPP
+#endif  // MQTT_TLS_HPP

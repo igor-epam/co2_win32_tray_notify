@@ -38,10 +38,10 @@ std::optional<AuthInfo> CredentialManager::GetAuthInfo(
     auto p_cred = p_cred_guard.GetPCredential();
     auto const exist = ::CredRead(id.data(), CRED_TYPE_GENERIC, NULL, p_cred);
     if (exist) {
-        return {
-            { std::move(id), std::wstring((*p_cred)->UserName), std::wstring(reinterpret_cast<wchar_t const*>((*p_cred)->CredentialBlob), (*p_cred)->CredentialBlobSize)
-            }
-        };
+        return {{std::move(id), std::wstring((*p_cred)->UserName),
+            std::wstring(
+                reinterpret_cast<wchar_t const*>((*p_cred)->CredentialBlob),
+                (*p_cred)->CredentialBlobSize)}};
     } else {
         auto const message_text =
             std::wstring(L"Enter credentials for MQTT broker ") +
@@ -91,8 +91,8 @@ std::optional<AuthInfo> CredentialManager::GetAuthInfo(
                     CREDENTIALW cred = {0};
                     cred.Type = CRED_TYPE_GENERIC;
                     cred.TargetName = id.data();
-                    cred.CredentialBlobSize =
-                        static_cast<DWORD>((password_size + 1) * sizeof(wchar_t));
+                    cred.CredentialBlobSize = static_cast<DWORD>(
+                        (password_size + 1) * sizeof(wchar_t));
                     cred.CredentialBlob =
                         reinterpret_cast<LPBYTE>(password.data());
                     cred.Persist = CRED_PERSIST_LOCAL_MACHINE;
@@ -102,8 +102,7 @@ std::optional<AuthInfo> CredentialManager::GetAuthInfo(
                 }
                 SecureZeroMemory(out_cred_buffer, out_cred_buffer_size);
                 CoTaskMemFree(out_cred_buffer);
-                AuthInfo info{std::move(id),
-                    std::wstring(user_name.data()),
+                AuthInfo info{std::move(id), std::wstring(user_name.data()),
                     std::wstring(password.data(), password_size)};
                 return std::move(info);
             }

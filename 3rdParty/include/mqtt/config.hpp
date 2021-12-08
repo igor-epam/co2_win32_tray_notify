@@ -12,12 +12,15 @@
 // Use boost variant
 
 // user intentionally defined BOOST_MPL_LIMIT_LIST_SIZE but size is too small
-// NOTE: if BOOST_MPL_LIMIT_LIST_SIZE is not defined, the value is evaluate as 0.
-#if defined(BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS) && BOOST_MPL_LIMIT_LIST_SIZE < 40
+// NOTE: if BOOST_MPL_LIMIT_LIST_SIZE is not defined, the value is evaluate as
+// 0.
+#if defined(BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS) && \
+    BOOST_MPL_LIMIT_LIST_SIZE < 40
 
 #error BOOST_MPL_LIMIT_LIST_SIZE need to greator or equal to 40
 
-#else  // defined(BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS) && BOOST_MPL_LIMIT_LIST_SIZE < 40
+#else  // defined(BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS) &&
+       // BOOST_MPL_LIMIT_LIST_SIZE < 40
 
 // user doesn't define BOOST_MPL_LIMIT_LIST_SIZE intentionally
 // but the defult value could be defined
@@ -26,11 +29,10 @@
 #define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 #define BOOST_MPL_LIMIT_LIST_SIZE 40
 
-#endif // defined(BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS) && BOOST_MPL_LIMIT_LIST_SIZE < 40
+#endif  // defined(BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS) &&
+        // BOOST_MPL_LIMIT_LIST_SIZE < 40
 
-
-#endif // !defined(MQTT_STD_VARIANT)
-
+#endif  // !defined(MQTT_STD_VARIANT)
 
 // Check whether to use standard executors only
 #if defined(MQTT_NO_TS_EXECUTORS)
@@ -41,16 +43,15 @@
 // Make sure standard executors are supported by Boost Asio
 #if BOOST_ASIO_VERSION < 101800
 #error Boost Asio version 1.18.0 required for no TS-style executors
-#endif // BOOST_ASIO_VERSION < 101800
+#endif  // BOOST_ASIO_VERSION < 101800
 
-#else // defined(MQTT_NO_TS_EXECUTORS)
+#else  // defined(MQTT_NO_TS_EXECUTORS)
 
 // Force no TS executors if Boost Asio accepts these only
 #if defined(BOOST_ASIO_NO_TS_EXECUTORS)
 #define MQTT_NO_TS_EXECUTORS
-#endif // defined(BOOST_ASIO_NO_TS_EXECUTORS)
+#endif  // defined(BOOST_ASIO_NO_TS_EXECUTORS)
 
-#endif // defined(MQTT_NO_TS_EXECUTORS)
+#endif  // defined(MQTT_NO_TS_EXECUTORS)
 
-
-#endif // MQTT_CONFIG_HPP
+#endif  // MQTT_CONFIG_HPP

@@ -12,24 +12,30 @@
 /**
  * @brief Type alias of shared_ptr char array.
  * You can choose the target type.
- * - If MQTT_STD_SHARED_PTR_ARRAY is defined, `std::shared_ptr<char []>` is used.
+ * - If MQTT_STD_SHARED_PTR_ARRAY is defined, `std::shared_ptr<char []>` is
+ * used.
  *   - std::shared_ptr<char []> is supported since C++17.
- * - If MQTT_STD_SHARED_PTR_ARRAY is not defined (default), `boost::shared_ptr<char []>` is used.
+ * - If MQTT_STD_SHARED_PTR_ARRAY is not defined (default),
+ * `boost::shared_ptr<char []>` is used.
  *   - `boost::shared_ptr<char []>` can be used on C++14.
  */
-using shared_ptr_array = std::shared_ptr<char []>;
-using const_shared_ptr_array = std::shared_ptr<char const []>;
+using shared_ptr_array = std::shared_ptr<char[]>;
+using const_shared_ptr_array = std::shared_ptr<char const[]>;
 
 /**
  * @brief shared_ptr_array creating function.
  * You can choose the target type.
  * - If MQTT_STD_SHARED_PTR_ARRAY is defined,
- *   - and if your compiler setting is C++20 or later, then `std::make_shared<char[]>(size)` is used.
- *      - It can allocate an array of characters and the control block in a single allocation.
+ *   - and if your compiler setting is C++20 or later, then
+ * `std::make_shared<char[]>(size)` is used.
+ *      - It can allocate an array of characters and the control block in a
+ * single allocation.
  *   - otherwise `std::shared_ptr<char[]>(new char[size])` is used.
  *      - It requires two times allocations.
- * - If MQTT_STD_SHARED_PTR_ARRAY is not defined (default), then `boost::make_shared<char[]>(size)` is used.
- *      - It can allocate an array of characters and the control block in a single allocation.
+ * - If MQTT_STD_SHARED_PTR_ARRAY is not defined (default), then
+ * `boost::make_shared<char[]>(size)` is used.
+ *      - It can allocate an array of characters and the control block in a
+ * single allocation.
  */
 inline shared_ptr_array make_shared_ptr_array(std::size_t size);
 
@@ -43,18 +49,18 @@ inline shared_ptr_array make_shared_ptr_array(std::size_t size);
 
 namespace MQTT_NS {
 
-using shared_ptr_array = std::shared_ptr<char []>;
-using const_shared_ptr_array = std::shared_ptr<char const []>;
+using shared_ptr_array = std::shared_ptr<char[]>;
+using const_shared_ptr_array = std::shared_ptr<char const[]>;
 
 inline shared_ptr_array make_shared_ptr_array(std::size_t size) {
-#if __cplusplus > 201703L // C++20 date is not determined yet
+#if __cplusplus > 201703L  // C++20 date is not determined yet
     return std::make_shared<char[]>(size);
-#else  // __cplusplus > 201703L
+#else                      // __cplusplus > 201703L
     return std::shared_ptr<char[]>(new char[size]);
-#endif // __cplusplus > 201703L
+#endif                     // __cplusplus > 201703L
 }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
 #else  // MQTT_STD_SHARED_PTR_ARRAY
 
@@ -63,17 +69,17 @@ inline shared_ptr_array make_shared_ptr_array(std::size_t size) {
 
 namespace MQTT_NS {
 
-using shared_ptr_array = boost::shared_ptr<char []>;
-using const_shared_ptr_array = boost::shared_ptr<char const []>;
+using shared_ptr_array = boost::shared_ptr<char[]>;
+using const_shared_ptr_array = boost::shared_ptr<char const[]>;
 
 inline shared_ptr_array make_shared_ptr_array(std::size_t size) {
     return boost::make_shared<char[]>(size);
 }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_STD_SHARED_PTR_ARRAY
+#endif  // MQTT_STD_SHARED_PTR_ARRAY
 
-#endif // defined(_DOXYGEN_)
+#endif  // defined(_DOXYGEN_)
 
-#endif // MQTT_SHARED_PTR_ARRAY_HPP
+#endif  // MQTT_SHARED_PTR_ARRAY_HPP

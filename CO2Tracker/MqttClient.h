@@ -31,8 +31,8 @@ class MqttClient final {
 
     MqttClient(std::wstring host, int port, std::wstring user,
         std::wstring password, std::wstring state_topic,
-        std::wstring query_topic, std::wstring will_topic, OnUpdate on_update, OnConnect on_connect,
-        OnDisconnect on_disconnect);
+        std::wstring query_topic, std::wstring will_topic, OnUpdate on_update,
+        OnConnect on_connect, OnDisconnect on_disconnect);
     ~MqttClient();
 
     void ForceQuery();

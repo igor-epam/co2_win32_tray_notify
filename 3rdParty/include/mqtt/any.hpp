@@ -18,7 +18,7 @@ namespace MQTT_NS {
 using std::any;
 using std::any_cast;
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
 #else  // MQTT_STD_ANY
 
@@ -29,8 +29,8 @@ namespace MQTT_NS {
 using boost::any;
 using boost::any_cast;
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // !defined(MQTT_STD_ANY)
+#endif  // !defined(MQTT_STD_ANY)
 
-#endif // MQTT_ANY_HPP
+#endif  // MQTT_ANY_HPP

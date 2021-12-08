@@ -7,16 +7,14 @@
 #if !defined(MQTT_BUFFER_HPP)
 #define MQTT_BUFFER_HPP
 
-#include <stdexcept>
-#include <utility>
-#include <type_traits>
-
 #include <boost/asio/buffer.hpp>
-
-#include <mqtt/namespace.hpp>
-#include <mqtt/string_view.hpp>
-#include <mqtt/shared_ptr_array.hpp>
 #include <mqtt/move.hpp>
+#include <mqtt/namespace.hpp>
+#include <mqtt/shared_ptr_array.hpp>
+#include <mqtt/string_view.hpp>
+#include <stdexcept>
+#include <type_traits>
+#include <utility>
 
 namespace MQTT_NS {
 
@@ -28,7 +26,7 @@ namespace as = boost::asio;
  * This class hold string_view target's lifetime optionally.
  */
 class buffer : public string_view {
-public:
+   public:
     /**
      * @brief string_view constructor
      * @param sv string_view
@@ -42,30 +40,32 @@ public:
      * @brief string constructor (deleted)
      * @param string
      * This constructor is intentionally deleted.
-     * Consider `buffer(std::string("ABC"))`, the buffer points to dangling reference.
+     * Consider `buffer(std::string("ABC"))`, the buffer points to dangling
+     * reference.
      */
-    explicit buffer(std::string) = delete; // to avoid misuse
+    explicit buffer(std::string) = delete;  // to avoid misuse
 
     /**
      * @brief string_view and lifetime constructor
      * @param sv string_view
      * @param spa shared_ptr_array that holds sv target's lifetime
-     * If user creates buffer via this constructor, spa's lifetime is held by the buffer.
+     * If user creates buffer via this constructor, spa's lifetime is held by
+     * the buffer.
      */
     buffer(string_view sv, const_shared_ptr_array spa)
-        : string_view(force_move(sv)),
-          lifetime_(force_move(spa)) {
-    }
+        : string_view(force_move(sv)), lifetime_(force_move(spa)) {}
 
     /**
      * @brief get substring
      * The returned buffer ragnge is the same as std::string_view::substr().
-     * In addition the lifetime is shared between returned buffer and this buffer.
+     * In addition the lifetime is shared between returned buffer and this
+     * buffer.
      * @param offset offset point of the buffer
      * @param length length of the buffer, If the length is string_view::npos
      *               then the length is from offset to the end of string.
      */
-    buffer substr(std::size_t offset, std::size_t length = string_view::npos) const& {
+    buffer substr(
+        std::size_t offset, std::size_t length = string_view::npos) const& {
         // range is checked in string_view::substr.
         return buffer(string_view::substr(offset, length), lifetime_);
     }
@@ -78,21 +78,22 @@ public:
      * @param length length of the buffer, If the length is string_view::npos
      *               then the length is from offset to the end of string.
      */
-    buffer substr(std::size_t offset, std::size_t length = string_view::npos) && {
+    buffer substr(
+        std::size_t offset, std::size_t length = string_view::npos) && {
         // range is checked in string_view::substr.
-        return buffer(string_view::substr(offset, length), force_move(lifetime_));
+        return buffer(
+            string_view::substr(offset, length), force_move(lifetime_));
     }
 
     /**
      * @brief check the buffer has lifetime.
      * @return true  the buffer has lifetime.
-     *         false the buffer doesn't have lifetime, This means the buffer is a pure view.
+     *         false the buffer doesn't have lifetime, This means the buffer is
+     * a pure view.
      */
-    bool has_life() const {
-        return lifetime_.get();
-    }
+    bool has_life() const { return lifetime_.get(); }
 
-private:
+   private:
     const_shared_ptr_array lifetime_;
 };
 
@@ -114,7 +115,7 @@ inline buffer operator""_mb(char const* str, std::size_t length) {
     return buffer(string_view(str, length));
 }
 
-} // namespace literals
+}  // namespace literals
 
 /**
  * @brief create buffer from the pair of iterators
@@ -172,71 +173,46 @@ template <typename>
 char buffer_sequence_begin_helper(...);
 
 template <typename T>
-char (&buffer_sequence_begin_helper(
-    T* t,
-    typename std::enable_if<
-        !std::is_same<
-            decltype(buffer_sequence_begin(*t)),
-            void
-        >::value
-    >::type*)
-)[2];
+char (&buffer_sequence_begin_helper(T* t,
+    typename std::enable_if<!std::is_same<decltype(buffer_sequence_begin(*t)),
+        void>::value>::type*))[2];
 
 template <typename>
 char buffer_sequence_end_helper(...);
 
 template <typename T>
-char (&buffer_sequence_end_helper(
-    T* t,
-    typename std::enable_if<
-        !std::is_same<
-            decltype(buffer_sequence_end(*t)),
-            void
-        >::value
-    >::type*)
-)[2];
+char (&buffer_sequence_end_helper(T* t,
+    typename std::enable_if<!std::is_same<decltype(buffer_sequence_end(*t)),
+        void>::value>::type*))[2];
 
 template <typename, typename>
 char (&buffer_sequence_element_type_helper(...))[2];
 
 template <typename T, typename Buffer>
 char buffer_sequence_element_type_helper(
-    T* t,
-    typename std::enable_if<
-        std::is_convertible<
-            decltype(*buffer_sequence_begin(*t)),
-            Buffer
-        >::value
-    >::type*
-);
+    T* t, typename std::enable_if<std::is_convertible<
+              decltype(*buffer_sequence_begin(*t)), Buffer>::value>::type*);
 
 template <typename T, typename Buffer>
 struct is_buffer_sequence_class
     : std::integral_constant<bool,
-      sizeof(buffer_sequence_begin_helper<T>(0, 0)) != 1 &&
-      sizeof(buffer_sequence_end_helper<T>(0, 0)) != 1 &&
-      sizeof(buffer_sequence_element_type_helper<T, Buffer>(0, 0)) == 1>
-{
-};
+          sizeof(buffer_sequence_begin_helper<T>(0, 0)) != 1 &&
+              sizeof(buffer_sequence_end_helper<T>(0, 0)) != 1 &&
+              sizeof(buffer_sequence_element_type_helper<T, Buffer>(0, 0)) ==
+                  1> {};
 
-} // namespace detail
+}  // namespace detail
 
 template <typename T>
-struct is_buffer_sequence :
-    std::conditional<
-        std::is_class<T>::value,
-        detail::is_buffer_sequence_class<T, buffer>,
-        std::false_type
-    >::type
-{
+struct is_buffer_sequence
+    : std::conditional<std::is_class<T>::value,
+          detail::is_buffer_sequence_class<T, buffer>, std::false_type>::type {
 };
 
 template <>
-struct is_buffer_sequence<buffer> : std::true_type
-{
-};
+struct is_buffer_sequence<buffer> : std::true_type {};
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
 namespace boost {
 namespace asio {
@@ -254,7 +230,7 @@ inline const_buffer buffer(MQTT_NS::buffer const& data) {
     return buffer(data.data(), data.size());
 }
 
-} // namespace asio
-} // namespace boost
+}  // namespace asio
+}  // namespace boost
 
-#endif // MQTT_BUFFER_HPP
+#endif  // MQTT_BUFFER_HPP

@@ -16,28 +16,25 @@ template <typename... Lambdas>
 struct lambda_visitor;
 
 template <typename Lambda1, typename... Lambdas>
-struct lambda_visitor<Lambda1, Lambdas...>
-    : Lambda1, lambda_visitor<Lambdas...> {
+struct lambda_visitor<Lambda1, Lambdas...> : Lambda1,
+                                             lambda_visitor<Lambdas...> {
     using Lambda1::operator();
     using lambda_visitor<Lambdas...>::operator();
     lambda_visitor(Lambda1 lambda1, Lambdas... lambdas)
         : Lambda1(lambda1), lambda_visitor<Lambdas...>(lambdas...) {}
 };
 
-
 template <typename Lambda1>
 struct lambda_visitor<Lambda1> : Lambda1 {
     using Lambda1::operator();
-    lambda_visitor(Lambda1 lambda1)
-        : Lambda1(lambda1) {}
+    lambda_visitor(Lambda1 lambda1) : Lambda1(lambda1) {}
 };
-
 
 template <typename... Lambdas>
 inline lambda_visitor<Lambdas...> make_lambda_visitor(Lambdas&&... lambdas) {
-    return { std::forward<Lambdas>(lambdas)... };
+    return {std::forward<Lambdas>(lambdas)...};
 }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_VISITOR_UTIL_HPP
+#endif  // MQTT_VISITOR_UTIL_HPP

@@ -8,17 +8,18 @@
 #define MQTT_SHARED_SCOPE_GUARD_HPP
 
 #include <memory>
-#include <utility>
 #include <mqtt/namespace.hpp>
+#include <utility>
 
 namespace MQTT_NS {
 
 template <typename Proc>
 inline auto shared_scope_guard(Proc&& proc) {
-    auto deleter = [proc = std::forward<Proc>(proc)](void*) mutable { std::forward<Proc>(proc)(); };
+    auto deleter = [proc = std::forward<Proc>(proc)](
+                       void*) mutable { std::forward<Proc>(proc)(); };
     return std::shared_ptr<void>(nullptr, std::move(deleter));
 }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_SHARED_SCOPE_GUARD_HPP
+#endif  // MQTT_SHARED_SCOPE_GUARD_HPP

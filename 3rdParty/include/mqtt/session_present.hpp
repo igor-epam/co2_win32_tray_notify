@@ -11,10 +11,8 @@
 
 namespace MQTT_NS {
 
-constexpr bool is_session_present(char v) {
-    return v & 0b00000001;
-}
+constexpr bool is_session_present(char v) { return v & 0b00000001; }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_SESSION_PRESENT_HPP
+#endif  // MQTT_SESSION_PRESENT_HPP

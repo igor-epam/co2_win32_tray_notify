@@ -7,24 +7,20 @@
 #if !defined(MQTT_CALLABLE_OVERLAY_HPP)
 #define MQTT_CALLABLE_OVERLAY_HPP
 
-#include <mqtt/variant.hpp> // should be top to configure variant limit
-
-#include <mqtt/namespace.hpp>
 #include <mqtt/attributes.hpp>
 #include <mqtt/endpoint.hpp>
 #include <mqtt/move.hpp>
+#include <mqtt/namespace.hpp>
+#include <mqtt/variant.hpp>  // should be top to configure variant limit
 
 namespace MQTT_NS {
-template<typename Impl>
-struct callable_overlay final : public Impl
-{
+template <typename Impl>
+struct callable_overlay final : public Impl {
     using base = Impl;
     using packet_id_t = typename base::packet_id_t;
 
-    template<typename ... Args>
-    callable_overlay(Args && ... args)
-     : base(std::forward<Args>(args)...)
-    { }
+    template <typename... Args>
+    callable_overlay(Args&&... args) : base(std::forward<Args>(args)...) {}
     ~callable_overlay() = default;
     callable_overlay(callable_overlay&&) = default;
     callable_overlay(callable_overlay const&) = default;
@@ -35,22 +31,26 @@ struct callable_overlay final : public Impl
 
     /**
      * @brief Pingreq handler
-     *        See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718086<BR>
+     *        See
+     * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718086<BR>
      *        3.13 PINGREQ – PING request
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_pingreq() noexcept override final {
-        return ! h_pingreq_ || h_pingreq_();
+        return !h_pingreq_ || h_pingreq_();
     }
 
     /**
      * @brief Pingresp handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901200<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901200<BR>
      *        3.13 PINGRESP – PING response
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_pingresp() noexcept override final {
-        return ! h_pingresp_ || h_pingresp_();
+        return !h_pingresp_ || h_pingresp_();
     }
 
     // MQTT v3_1_1 handlers
@@ -59,69 +59,77 @@ struct callable_overlay final : public Impl
      * @brief Connect handler
      * @param client_id
      *        Client Identifier.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
      *        3.1.3.1 Client Identifier
      * @param user_name
      *        User Name.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
      *        3.1.3.4 User Name
      * @param password
      *        Password.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349246<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349246<BR>
      *        3.1.3.5 Password
      * @param will
      *        Will. It contains retain, QoS, topic, and message.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349232<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349232<BR>
      *        3.1.2.5 Will Flag<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349233<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349233<BR>
      *        3.1.2.6 Will QoS<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349234<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349234<BR>
      *        3.1.2.7 Will Retain<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349243<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349243<BR>
      *        3.1.3.2 Will Topic<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349244<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349244<BR>
      *        3.1.3.3 Will Message<BR>
      * @param clean_session
      *        Clean Session<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349231<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349231<BR>
      *        3.1.2.4 Clean Session
      * @param keep_alive
      *        Keep Alive<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349237<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349237<BR>
      *        3.1.2.10 Keep Alive
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      *
      */
     MQTT_ALWAYS_INLINE bool on_connect(buffer client_id,
-                                       optional<buffer> user_name,
-                                       optional<buffer> password,
-                                       optional<will> will,
-                                       bool clean_session,
-                                       std::uint16_t keep_alive) noexcept override final {
-        return    ! h_connect_
-               || h_connect_(force_move(client_id),
-                             force_move(user_name),
-                             force_move(password),
-                             force_move(will),
-                             clean_session,
-                             keep_alive);
+        optional<buffer> user_name, optional<buffer> password,
+        optional<will> will, bool clean_session,
+        std::uint16_t keep_alive) noexcept override final {
+        return !h_connect_ || h_connect_(force_move(client_id),
+                                  force_move(user_name), force_move(password),
+                                  force_move(will), clean_session, keep_alive);
     }
 
     /**
      * @brief Connack handler
      * @param session_present
      *        Session present flag.<BR>
-     *        See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
+     *        See
+     * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
      *        3.2.2.2 Session Present
      * @param return_code
      *        connect_return_code<BR>
-     *        See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
+     *        See
+     * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
      *        3.2.2.3 Connect Return code
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    MQTT_ALWAYS_INLINE bool on_connack(bool session_present, connect_return_code return_code) noexcept override final {
-        return    ! h_connack_
-               || h_connack_(session_present, return_code);
+    MQTT_ALWAYS_INLINE bool on_connack(bool session_present,
+        connect_return_code return_code) noexcept override final {
+        return !h_connack_ || h_connack_(session_present, return_code);
     }
 
     /**
@@ -129,149 +137,165 @@ struct callable_overlay final : public Impl
      * @param packet_id
      *        packet identifier<BR>
      *        If received publish's QoS is 0, packet_id is nullopt.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718039<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718039<BR>
      *        3.3.2  Variable header
      * @param fixed_header
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718038<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718038<BR>
      *        3.3.1 Fixed header<BR>
      *        You can check the fixed header using publish functions.
      * @param topic_name
      *        Topic name
      * @param contents
      *        Published contents
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_publish(optional<packet_id_t> packet_id,
-                                       publish_options pubopts,
-                                       buffer topic_name,
-                                       buffer contents) noexcept override final {
-        return    ! h_publish_
-               || h_publish_(packet_id,
-                             pubopts,
-                             force_move(topic_name),
-                             force_move(contents));
+        publish_options pubopts, buffer topic_name,
+        buffer contents) noexcept override final {
+        return !h_publish_ || h_publish_(packet_id, pubopts,
+                                  force_move(topic_name), force_move(contents));
     }
 
     /**
      * @brief Puback handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
      *        3.4.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    MQTT_ALWAYS_INLINE bool on_puback(packet_id_t packet_id) noexcept override final {
-        return    ! h_puback_
-               || h_puback_(packet_id);
+    MQTT_ALWAYS_INLINE bool on_puback(
+        packet_id_t packet_id) noexcept override final {
+        return !h_puback_ || h_puback_(packet_id);
     }
 
     /**
      * @brief Pubrec handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718050<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718050<BR>
      *        3.5.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    MQTT_ALWAYS_INLINE bool on_pubrec(packet_id_t packet_id) noexcept override final {
-        return    ! h_pubrec_
-               || h_pubrec_(packet_id);
+    MQTT_ALWAYS_INLINE bool on_pubrec(
+        packet_id_t packet_id) noexcept override final {
+        return !h_pubrec_ || h_pubrec_(packet_id);
     }
 
     /**
      * @brief Pubrel handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349791<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349791<BR>
      *        3.6.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    MQTT_ALWAYS_INLINE bool on_pubrel(packet_id_t packet_id) noexcept override final {
-        return    ! h_pubrel_
-               || h_pubrel_(packet_id);
+    MQTT_ALWAYS_INLINE bool on_pubrel(
+        packet_id_t packet_id) noexcept override final {
+        return !h_pubrel_ || h_pubrel_(packet_id);
     }
 
     /**
      * @brief Pubcomp handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718060<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718060<BR>
      *        3.7.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    MQTT_ALWAYS_INLINE bool on_pubcomp(packet_id_t packet_id) noexcept override final {
-        return    ! h_pubcomp_
-               || h_pubcomp_(packet_id);
+    MQTT_ALWAYS_INLINE bool on_pubcomp(
+        packet_id_t packet_id) noexcept override final {
+        return !h_pubcomp_ || h_pubcomp_(packet_id);
     }
 
     /**
      * @brief Subscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349801<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349801<BR>
      *        3.8.2 Variable header
      * @param entries
      *        Collection of Share Name, Topic Filter, and QoS.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349802<BR>
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349802<BR>
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_subscribe(packet_id_t packet_id,
-                                         std::vector<subscribe_entry> entries) noexcept override final {
-        return    ! h_subscribe_
-               || h_subscribe_(packet_id, force_move(entries));
+        std::vector<subscribe_entry> entries) noexcept override final {
+        return !h_subscribe_ || h_subscribe_(packet_id, force_move(entries));
     }
 
     /**
      * @brief Suback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718070<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718070<BR>
      *        3.9.2 Variable header
      * @param qoss
-     *        Collection of QoS that is corresponding to subscribed topic order.<BR>
-     *        If subscription is failure, the value is nullopt.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718071<BR>
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     *        Collection of QoS that is corresponding to subscribed topic
+     * order.<BR> If subscription is failure, the value is nullopt.<BR> See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718071<BR>
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_suback(packet_id_t packet_id,
-                                      std::vector<suback_return_code> reasons) noexcept override final {
-        return    ! h_suback_
-               || h_suback_(packet_id, force_move(reasons));
+        std::vector<suback_return_code> reasons) noexcept override final {
+        return !h_suback_ || h_suback_(packet_id, force_move(reasons));
     }
 
     /**
      * @brief Unsubscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349810<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349810<BR>
      *        3.10.2 Variable header
      * @param topics
      *        Collection of Share Name and Topic Filter<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800448<BR>
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800448<BR>
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_unsubscribe(packet_id_t packet_id,
-                                           std::vector<unsubscribe_entry> entries) noexcept override final {
-        return    ! h_unsubscribe_
-               || h_unsubscribe_(packet_id, force_move(entries));
+        std::vector<unsubscribe_entry> entries) noexcept override final {
+        return !h_unsubscribe_ ||
+               h_unsubscribe_(packet_id, force_move(entries));
     }
 
     /**
      * @brief Unsuback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
      *        3.11.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    MQTT_ALWAYS_INLINE bool on_unsuback(packet_id_t packet_id) noexcept override final {
-        return    ! h_unsuback_
-               || h_unsuback_(packet_id);
+    MQTT_ALWAYS_INLINE bool on_unsuback(
+        packet_id_t packet_id) noexcept override final {
+        return !h_unsuback_ || h_unsuback_(packet_id);
     }
 
     /**
      * @brief Disconnect handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800463<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800463<BR>
      *        3.14 DISCONNECT – Disconnect notification
      */
     MQTT_ALWAYS_INLINE void on_disconnect() noexcept override final {
-        if(h_disconnect_) h_disconnect_();
+        if (h_disconnect_) h_disconnect_();
     }
 
     // MQTT v5 handlers
@@ -280,83 +304,93 @@ struct callable_overlay final : public Impl
      * @brief Connect handler
      * @param client_id
      *        Client Identifier.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901059<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901059<BR>
      *        3.1.3.1 Client Identifier
      * @param user_name
      *        User Name.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901071<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901071<BR>
      *        3.1.3.4 User Name
      * @param password
      *        Password.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901072<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901072<BR>
      *        3.1.3.5 Password
      * @param will
      *        Will. It contains retain, QoS, propertied, topic, and message.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901040<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901040<BR>
      *        3.1.2.5 Will Flag<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901041<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901041<BR>
      *        3.1.2.6 Will QoS<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901042<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901042<BR>
      *        3.1.2.7 Will Retain<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901060<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901060<BR>
      *        3.1.3.2 Will Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901069<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901069<BR>
      *        3.1.3.3 Will Topic<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901070<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901070<BR>
      *        3.1.3.3 Will Payload<BR>
      * @param clean_start
      *        Clean Start<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901039<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901039<BR>
      *        3.1.2.4 Clean Session
      * @param keep_alive
      *        Keep Alive<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901045<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901045<BR>
      *        3.1.2.10 Keep Alive
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901046<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901046<BR>
      *        3.1.2.11 CONNECT Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      *
      */
     MQTT_ALWAYS_INLINE bool on_v5_connect(buffer client_id,
-                                          optional<buffer> user_name,
-                                          optional<buffer> password,
-                                          optional<will> will,
-                                          bool clean_start,
-                                          std::uint16_t keep_alive,
-                                          v5::properties props) noexcept override final {
-        return    ! h_v5_connect_
-               || h_v5_connect_(force_move(client_id),
-                                force_move(user_name),
-                                force_move(password),
-                                force_move(will),
-                                clean_start,
-                                keep_alive,
-                                force_move(props));
+        optional<buffer> user_name, optional<buffer> password,
+        optional<will> will, bool clean_start, std::uint16_t keep_alive,
+        v5::properties props) noexcept override final {
+        return !h_v5_connect_ ||
+               h_v5_connect_(force_move(client_id), force_move(user_name),
+                   force_move(password), force_move(will), clean_start,
+                   keep_alive, force_move(props));
     }
 
     /**
      * @brief Connack handler
      * @param session_present
      *        Session present flag.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901078<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901078<BR>
      *        3.2.2.1.1 Session Present
      * @param reason_code
      *        Connect Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901079<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901079<BR>
      *        3.2.2.2 Connect Reason code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901080<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901080<BR>
      *        3.2.2.3 CONNACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_connack(bool session_present,
-                                          v5::connect_reason_code reason_code,
-                                          v5::properties props) noexcept override final {
-        return    ! h_v5_connack_
-               || h_v5_connack_(session_present, reason_code, force_move(props));
+        v5::connect_reason_code reason_code,
+        v5::properties props) noexcept override final {
+        return !h_v5_connack_ ||
+               h_v5_connack_(session_present, reason_code, force_move(props));
     }
 
     /**
@@ -364,255 +398,295 @@ struct callable_overlay final : public Impl
      * @param packet_id
      *        packet identifier<BR>
      *        If received publish's QoS is 0, packet_id is nullopt.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901108<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901108<BR>
      *        3.3.2.2 Packet Identifier
      * @param fixed_header
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901101<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901101<BR>
      *        3.3.1 Fixed header<BR>
      *        You can check the fixed header using publish functions.
      * @param topic_name
      *        Topic name<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901107<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901107<BR>
      *        3.3.2.1 Topic Name<BR>
      * @param contents
      *        Publish Payload<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901119<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901119<BR>
      *        3.3.3 PUBLISH Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901109<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901109<BR>
      *        3.3.2.3 PUBLISH Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_publish(optional<packet_id_t> packet_id,
-                                          publish_options pubopts,
-                                          buffer topic_name,
-                                          buffer contents,
-                                          v5::properties props) noexcept override final {
-        return    ! h_v5_publish_
-               || h_v5_publish_(packet_id,
-                                pubopts,
-                                force_move(topic_name),
-                                force_move(contents),
-                                force_move(props));
+        publish_options pubopts, buffer topic_name, buffer contents,
+        v5::properties props) noexcept override final {
+        return !h_v5_publish_ ||
+               h_v5_publish_(packet_id, pubopts, force_move(topic_name),
+                   force_move(contents), force_move(props));
     }
 
     /**
      * @brief Puback handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901123<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901123<BR>
      *        3.4.2 Variable header
      * @param reason_code
      *        PUBACK Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901124<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901124<BR>
      *        3.4.2.1 PUBACK Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901125<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901125<BR>
      *        3.4.2.2 PUBACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_puback(packet_id_t packet_id,
-                                         v5::puback_reason_code reason_code,
-                                         v5::properties props) noexcept override final {
-        return    ! h_v5_puback_
-               || h_v5_puback_(packet_id, reason_code, force_move(props));
+        v5::puback_reason_code reason_code,
+        v5::properties props) noexcept override final {
+        return !h_v5_puback_ ||
+               h_v5_puback_(packet_id, reason_code, force_move(props));
     }
 
     /**
      * @brief Pubrec handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901133<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901133<BR>
      *        3.5.2 Variable header
      * @param reason_code
      *        PUBREC Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901134<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901134<BR>
      *        3.5.2.1 PUBREC Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901135<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901135<BR>
      *        3.5.2.2 PUBREC Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_pubrec(packet_id_t packet_id,
-                                         v5::pubrec_reason_code reason_code,
-                                         v5::properties props) noexcept override final {
-        return    ! h_v5_pubrec_
-               || h_v5_pubrec_(packet_id, reason_code, force_move(props));
+        v5::pubrec_reason_code reason_code,
+        v5::properties props) noexcept override final {
+        return !h_v5_pubrec_ ||
+               h_v5_pubrec_(packet_id, reason_code, force_move(props));
     }
 
     /**
      * @brief Pubrel handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901143<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901143<BR>
      *        3.6.2 Variable header
      * @param reason_code
      *        PUBREL Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901144<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901144<BR>
      *        3.6.2.1 PUBREL Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901145<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901145<BR>
      *        3.6.2.2 PUBREL Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_pubrel(packet_id_t packet_id,
-                                         v5::pubrel_reason_code reason_code,
-                                         v5::properties props) noexcept override final {
-        return    ! h_v5_pubrel_
-               || h_v5_pubrel_(packet_id, reason_code, force_move(props));
+        v5::pubrel_reason_code reason_code,
+        v5::properties props) noexcept override final {
+        return !h_v5_pubrel_ ||
+               h_v5_pubrel_(packet_id, reason_code, force_move(props));
     }
 
     /**
      * @brief Pubcomp handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901153<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901153<BR>
      *        3.7.2 Variable header
      * @param reason_code
      *        PUBCOMP Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901154<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901154<BR>
      *        3.7.2.1 PUBCOMP Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901155<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901155<BR>
      *        3.7.2.2 PUBCOMP Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_pubcomp(packet_id_t packet_id,
-                                          v5::pubcomp_reason_code reason_code,
-                                          v5::properties props) noexcept override final {
-        return    ! h_v5_pubcomp_
-               || h_v5_pubcomp_(packet_id, reason_code, force_move(props));
+        v5::pubcomp_reason_code reason_code,
+        v5::properties props) noexcept override final {
+        return !h_v5_pubcomp_ ||
+               h_v5_pubcomp_(packet_id, reason_code, force_move(props));
     }
 
     /**
      * @brief Subscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901163<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901163<BR>
      *        3.8.2 Variable header
      * @param entries
      *        Collection of Share Name, Topic Filter, and QoS.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901168<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901168<BR>
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901164<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901164<BR>
      *        3.8.2.1 SUBSCRIBE Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_subscribe(packet_id_t packet_id,
-                                            std::vector<subscribe_entry> entries,
-                                            v5::properties props) noexcept override final {
-        return    ! h_v5_subscribe_
-               || h_v5_subscribe_(packet_id, force_move(entries), force_move(props));
+        std::vector<subscribe_entry> entries,
+        v5::properties props) noexcept override final {
+        return !h_v5_subscribe_ || h_v5_subscribe_(packet_id,
+                                       force_move(entries), force_move(props));
     }
 
     /**
      * @brief Suback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901173<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901173<BR>
      *        3.9.2 Variable header
      * @param reasons
      *        Collection of reason_code.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901178<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901178<BR>
      *        3.9.3 SUBACK Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901174<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901174<BR>
      *        3.9.2.1 SUBACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_suback(packet_id_t packet_id,
-                                         std::vector<v5::suback_reason_code> reasons,
-                                         v5::properties props) noexcept override final {
-        return    ! h_v5_suback_
-               || h_v5_suback_(packet_id, force_move(reasons), force_move(props));
+        std::vector<v5::suback_reason_code> reasons,
+        v5::properties props) noexcept override final {
+        return !h_v5_suback_ ||
+               h_v5_suback_(packet_id, force_move(reasons), force_move(props));
     }
 
     /**
      * @brief Unsubscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901181<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901181<BR>
      *        3.10.2 Variable header
      * @param entries
      *        Collection of Share Name and Topic Filter<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901185<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901185<BR>
      *        3.10.3 UNSUBSCRIBE Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901182<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901182<BR>
      *        3.10.2.1 UNSUBSCRIBE Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_unsubscribe(packet_id_t packet_id,
-                                              std::vector<unsubscribe_entry> entries,
-                                              v5::properties props) noexcept override final {
-        return    ! h_v5_unsubscribe_
-               || h_v5_unsubscribe_(packet_id, force_move(entries), force_move(props));
+        std::vector<unsubscribe_entry> entries,
+        v5::properties props) noexcept override final {
+        return !h_v5_unsubscribe_ ||
+               h_v5_unsubscribe_(
+                   packet_id, force_move(entries), force_move(props));
     }
 
     /**
      * @brief Unsuback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901189<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901189<BR>
      *        3.11.2 Variable header
      * @param reasons
      *        Collection of reason_code.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901194<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901194<BR>
      *        3.11.3 UNSUBACK Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901190<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901190<BR>
      *        3.11.2.1 UNSUBACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_unsuback(packet_id_t packet_id,
-                                           std::vector<v5::unsuback_reason_code> reasons,
-                                           v5::properties props) noexcept override final {
-        return    ! h_v5_unsuback_
-               || h_v5_unsuback_(packet_id, force_move(reasons), force_move(props));
+        std::vector<v5::unsuback_reason_code> reasons,
+        v5::properties props) noexcept override final {
+        return !h_v5_unsuback_ || h_v5_unsuback_(packet_id, force_move(reasons),
+                                      force_move(props));
     }
 
     /**
      * @brief Disconnect handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901205<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901205<BR>
      *        3.14 DISCONNECT – Disconnect notification
      * @param reason_code
      *        DISCONNECT Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901208<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901208<BR>
      *        3.14.2.1 Disconnect Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901209<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901209<BR>
      *        3.14.2.2 DISCONNECT Properties
      */
-    MQTT_ALWAYS_INLINE void on_v5_disconnect(v5::disconnect_reason_code reason_code,
-                                             v5::properties props) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_v5_disconnect(
+        v5::disconnect_reason_code reason_code,
+        v5::properties props) noexcept override final {
         if (h_v5_disconnect_) h_v5_disconnect_(reason_code, force_move(props));
     }
 
     /**
      * @brief Auth handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901217<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901217<BR>
      *        3.15 AUTH – Authentication exchange
      * @param reason_code
      *        AUTH Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901220<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901220<BR>
      *        3.15.2.1 Authenticate Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901221<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901221<BR>
      *        3.15.2.2 AUTH Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     MQTT_ALWAYS_INLINE bool on_v5_auth(v5::auth_reason_code reason_code,
-                                       v5::properties props) noexcept override final {
-        return    ! h_v5_auth_
-               || h_v5_auth_(reason_code, force_move(props));
-
+        v5::properties props) noexcept override final {
+        return !h_v5_auth_ || h_v5_auth_(reason_code, force_move(props));
     }
 
     // Original handlers
@@ -620,9 +694,10 @@ struct callable_overlay final : public Impl
     /**
      * @brief Close handler
      *
-     * This handler is called if the client called `disconnect()` and the server closed the socket cleanly.
-     * If the socket is closed by other reasons, error_handler is called.
-     * This calls base::on_close() prior to calling the provided callback, if any.
+     * This handler is called if the client called `disconnect()` and the server
+     * closed the socket cleanly. If the socket is closed by other reasons,
+     * error_handler is called. This calls base::on_close() prior to calling the
+     * provided callback, if any.
      */
     MQTT_ALWAYS_INLINE void on_close() noexcept override final {
         base::on_close();
@@ -632,8 +707,9 @@ struct callable_overlay final : public Impl
     /**
      * @brief Error handler
      *
-     * This handler is called if the socket is closed without client's `disconnect()` call.
-     * This calls base::on_error() prior to calling the provided callback, if any.
+     * This handler is called if the socket is closed without client's
+     * `disconnect()` call. This calls base::on_error() prior to calling the
+     * provided callback, if any.
      *
      * @param ec error code
      */
@@ -644,13 +720,16 @@ struct callable_overlay final : public Impl
 
     /**
      * @brief Publish response sent handler
-     *        This function is called just after puback sent on QoS1, or pubcomp sent on QoS2.
+     *        This function is called just after puback sent on QoS1, or pubcomp
+     * sent on QoS2.
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901026<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901026<BR>
      *        2.2.1 Packet Identifier
      */
-    MQTT_ALWAYS_INLINE void on_pub_res_sent(packet_id_t packet_id) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_pub_res_sent(
+        packet_id_t packet_id) noexcept override final {
         if (h_pub_res_sent_) h_pub_res_sent_(packet_id);
     }
 
@@ -660,7 +739,9 @@ struct callable_overlay final : public Impl
      *        To restore the message, use restore_serialized_message().
      * @param msg publish message
      */
-    MQTT_ALWAYS_INLINE void on_serialize_publish_message(basic_publish_message<sizeof(packet_id_t)> msg) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_serialize_publish_message(
+        basic_publish_message<sizeof(packet_id_t)> msg) noexcept override
+        final {
         if (h_serialize_publish_) h_serialize_publish_(msg);
     }
 
@@ -670,31 +751,36 @@ struct callable_overlay final : public Impl
      *        To restore the message, use restore_serialized_message().
      * @param msg v5::publish message
      */
-    MQTT_ALWAYS_INLINE void on_serialize_v5_publish_message(v5::basic_publish_message<sizeof(packet_id_t)> msg) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_serialize_v5_publish_message(
+        v5::basic_publish_message<sizeof(packet_id_t)> msg) noexcept override
+        final {
         if (h_serialize_v5_publish_) h_serialize_v5_publish_(msg);
     }
 
     /**
      * @brief Serialize pubrel handler
      *        You can serialize the pubrel message.
-     *        If your storage has already had the publish message that has the same packet_id,
-     *        then you need to replace the publish message to pubrel message.
-     *        To restore the message, use restore_serialized_message().
+     *        If your storage has already had the publish message that has the
+     * same packet_id, then you need to replace the publish message to pubrel
+     * message. To restore the message, use restore_serialized_message().
      * @param msg pubrel message
      */
-    MQTT_ALWAYS_INLINE void on_serialize_pubrel_message(basic_pubrel_message<sizeof(packet_id_t)> msg) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_serialize_pubrel_message(
+        basic_pubrel_message<sizeof(packet_id_t)> msg) noexcept override final {
         if (h_serialize_pubrel_) h_serialize_pubrel_(msg);
     }
 
     /**
      * @brief Serialize pubrel handler
      *        You can serialize the pubrel message.
-     *        If your storage has already had the publish message that has the same packet_id,
-     *        then you need to replace the publish message to pubrel message.
-     *        To restore the message, use restore_serialized_message().
+     *        If your storage has already had the publish message that has the
+     * same packet_id, then you need to replace the publish message to pubrel
+     * message. To restore the message, use restore_serialized_message().
      * @param msg pubrel message
      */
-    MQTT_ALWAYS_INLINE void on_serialize_v5_pubrel_message(v5::basic_pubrel_message<sizeof(packet_id_t)> msg) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_serialize_v5_pubrel_message(
+        v5::basic_pubrel_message<sizeof(packet_id_t)> msg) noexcept override
+        final {
         if (h_serialize_v5_pubrel_) h_serialize_v5_pubrel_(msg);
     }
 
@@ -702,13 +788,15 @@ struct callable_overlay final : public Impl
      * @brief Remove serialized message
      * @param packet_id packet identifier of the removing message
      */
-    MQTT_ALWAYS_INLINE void on_serialize_remove(packet_id_t packet_id) noexcept override final {
+    MQTT_ALWAYS_INLINE void on_serialize_remove(
+        packet_id_t packet_id) noexcept override final {
         if (h_serialize_remove_) h_serialize_remove_(packet_id);
     }
 
     /**
      * @brief Pre-send handler
-     *        This handler is called when any mqtt control packet is decided to send.
+     *        This handler is called when any mqtt control packet is decided to
+     * send.
      */
     MQTT_ALWAYS_INLINE void on_pre_send() noexcept override final {
         base::on_pre_send();
@@ -722,52 +810,62 @@ struct callable_overlay final : public Impl
      * @param remaining length
      * @return true if check is success, otherwise false
      */
-    MQTT_ALWAYS_INLINE bool check_is_valid_length(control_packet_type packet_type, std::size_t remaining_length) noexcept override final {
-        return    ! h_is_valid_length_
-               || h_is_valid_length_(packet_type, remaining_length);
+    MQTT_ALWAYS_INLINE bool check_is_valid_length(
+        control_packet_type packet_type,
+        std::size_t remaining_length) noexcept override final {
+        return !h_is_valid_length_ ||
+               h_is_valid_length_(packet_type, remaining_length);
     }
 
     /**
      * @brief next read handler
-     *        This handler is called when the current mqtt message has been processed.
-     *        This calls base::on_mqtt_message_processed() only if mqtt_message_processed handler is not set.
-     *        * `client` inherits `endpoint` and override `on_pre_send()`, `on_close()`, and `on_error()`.
-     *           And implement important process *1 in the override definition (timer reset, timer cancel).
-     *        * `client` has `set_pre_send_handler()`, `set_on_close()`, and `set_on_error()`.
-     *          If a user of `client` call them, and the event happens, set handler should be called.
-     *          Either the user set handlers or not, *1 should be executed automatically.
-     *        * `endpoint` has the default definition of `on_mqtt_message_processed()`.
-     *          `client` doesn't override `on_mqtt_message_processed()`.
-     *          If a user override this, then the default definition shouldn't be called. It makes conflict behavior.
-     *        * Other `on_*()` doesn't have the default definition. `callable_overlay` calls the corresponding
-     *          handler only if it is set.
-     * @param func A callback function that is called when async operation will finish.
+     *        This handler is called when the current mqtt message has been
+     * processed. This calls base::on_mqtt_message_processed() only if
+     * mqtt_message_processed handler is not set.
+     *        * `client` inherits `endpoint` and override `on_pre_send()`,
+     * `on_close()`, and `on_error()`. And implement important process *1 in the
+     * override definition (timer reset, timer cancel).
+     *        * `client` has `set_pre_send_handler()`, `set_on_close()`, and
+     * `set_on_error()`. If a user of `client` call them, and the event happens,
+     * set handler should be called. Either the user set handlers or not, *1
+     * should be executed automatically.
+     *        * `endpoint` has the default definition of
+     * `on_mqtt_message_processed()`. `client` doesn't override
+     * `on_mqtt_message_processed()`. If a user override this, then the default
+     * definition shouldn't be called. It makes conflict behavior.
+     *        * Other `on_*()` doesn't have the default definition.
+     * `callable_overlay` calls the corresponding handler only if it is set.
+     * @param func A callback function that is called when async operation will
+     * finish.
      */
-    MQTT_ALWAYS_INLINE void on_mqtt_message_processed(any session_life_keeper) noexcept override final {
-        if(h_mqtt_message_processed_) {
+    MQTT_ALWAYS_INLINE void on_mqtt_message_processed(
+        any session_life_keeper) noexcept override final {
+        if (h_mqtt_message_processed_) {
             h_mqtt_message_processed_(force_move(session_life_keeper));
-        }
-        else {
+        } else {
             base::on_mqtt_message_processed(force_move(session_life_keeper));
         }
     }
 
     /**
      * @brief Pingreq handler
-     *        See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718086<BR>
+     *        See
+     * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718086<BR>
      *        3.13 PINGREQ – PING request
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using pingreq_handler = std::function<bool()>;
 
     /**
      * @brief Pingresp handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901200<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901200<BR>
      *        3.13 PINGRESP – PING response
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using pingresp_handler = std::function<bool()>;
-
 
     // MQTT v3_1_1 handlers
 
@@ -775,90 +873,104 @@ struct callable_overlay final : public Impl
      * @brief Connect handler
      * @param client_id
      *        Client Identifier.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
      *        3.1.3.1 Client Identifier
      * @param user_name
      *        User Name.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349245<BR>
      *        3.1.3.4 User Name
      * @param password
      *        Password.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349246<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349246<BR>
      *        3.1.3.5 Password
      * @param will
      *        Will. It contains retain, QoS, topic, and message.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349232<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349232<BR>
      *        3.1.2.5 Will Flag<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349233<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349233<BR>
      *        3.1.2.6 Will QoS<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349234<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349234<BR>
      *        3.1.2.7 Will Retain<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349243<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349243<BR>
      *        3.1.3.2 Will Topic<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349244<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349244<BR>
      *        3.1.3.3 Will Message<BR>
      * @param clean_session
      *        Clean Session<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349231<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349231<BR>
      *        3.1.2.4 Clean Session
      * @param keep_alive
      *        Keep Alive<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349237<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349237<BR>
      *        3.1.2.10 Keep Alive
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      *
      */
-    using connect_handler = std::function<
-        bool(buffer client_id,
-             optional<buffer> user_name,
-             optional<buffer> password,
-             optional<will> will,
-             bool clean_session,
-             std::uint16_t keep_alive)>;
+    using connect_handler = std::function<bool(buffer client_id,
+        optional<buffer> user_name, optional<buffer> password,
+        optional<will> will, bool clean_session, std::uint16_t keep_alive)>;
 
     /**
      * @brief Connack handler
      * @param session_present
      *        Session present flag.<BR>
-     *        See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
+     *        See
+     * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
      *        3.2.2.2 Session Present
      * @param return_code
      *        connect_return_code<BR>
-     *        See http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
+     *        See
+     * http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718036<BR>
      *        3.2.2.3 Connect Return code
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using connack_handler = std::function<bool(bool session_present, connect_return_code return_code)>;
+    using connack_handler = std::function<bool(
+        bool session_present, connect_return_code return_code)>;
 
     /**
      * @brief Publish handler
      * @param fixed_header
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718038<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718038<BR>
      *        3.3.1 Fixed header<BR>
      *        You can check the fixed header using publish functions.
      * @param packet_id
      *        packet identifier<BR>
      *        If received publish's QoS is 0, packet_id is nullopt.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718039<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718039<BR>
      *        3.3.2  Variable header
      * @param topic_name
      *        Topic name
      * @param contents
      *        Published contents
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using publish_handler = std::function<bool(optional<packet_id_t> packet_id,
-                                               publish_options pubopts,
-                                               buffer topic_name,
-                                               buffer contents)>;
+        publish_options pubopts, buffer topic_name, buffer contents)>;
 
     /**
      * @brief Puback handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
      *        3.4.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using puback_handler = std::function<bool(packet_id_t packet_id)>;
 
@@ -866,9 +978,11 @@ struct callable_overlay final : public Impl
      * @brief Pubrec handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718050<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718050<BR>
      *        3.5.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using pubrec_handler = std::function<bool(packet_id_t packet_id)>;
 
@@ -876,9 +990,11 @@ struct callable_overlay final : public Impl
      * @brief Pubrel handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349791<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349791<BR>
      *        3.6.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using pubrel_handler = std::function<bool(packet_id_t packet_id)>;
 
@@ -886,64 +1002,77 @@ struct callable_overlay final : public Impl
      * @brief Pubcomp handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718060<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718060<BR>
      *        3.7.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using pubcomp_handler = std::function<bool(packet_id_t packet_id)>;
 
     /**
      * @brief Subscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349801<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349801<BR>
      *        3.8.2 Variable header
      * @param entries
      *        Collection of Share Name, Topic Filter, and QoS.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349802<BR>
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349802<BR>
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using subscribe_handler = std::function<bool(packet_id_t packet_id,
-                                                 std::vector<subscribe_entry> entries)>;
+    using subscribe_handler = std::function<bool(
+        packet_id_t packet_id, std::vector<subscribe_entry> entries)>;
 
     /**
      * @brief Suback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718070<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718070<BR>
      *        3.9.2 Variable header
      * @param qoss
-     *        Collection of QoS that is corresponding to subscribed topic order.<BR>
-     *        If subscription is failure, the value is nullopt.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718071<BR>
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     *        Collection of QoS that is corresponding to subscribed topic
+     * order.<BR> If subscription is failure, the value is nullopt.<BR> See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718071<BR>
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using suback_handler = std::function<bool(packet_id_t packet_id,
-                                              std::vector<suback_return_code> qoss)>;
+    using suback_handler = std::function<bool(
+        packet_id_t packet_id, std::vector<suback_return_code> qoss)>;
 
     /**
      * @brief Unsubscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349810<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc385349810<BR>
      *        3.10.2 Variable header
      * @param entries
      *        Collection of Share Name and Topic Filter<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800448<BR>
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800448<BR>
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using unsubscribe_handler = std::function<bool(packet_id_t packet_id,
-                                                   std::vector<unsubscribe_entry> entries)>;
+    using unsubscribe_handler = std::function<bool(
+        packet_id_t packet_id, std::vector<unsubscribe_entry> entries)>;
 
     /**
      * @brief Unsuback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc398718045<BR>
      *        3.11.2 Variable header
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
     using unsuback_handler = std::function<bool(packet_id_t)>;
 
     /**
      * @brief Disconnect handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800463<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc384800463<BR>
      *        3.14 DISCONNECT – Disconnect notification
      */
     using disconnect_handler = std::function<void()>;
@@ -954,333 +1083,356 @@ struct callable_overlay final : public Impl
      * @brief Connect handler
      * @param client_id
      *        Client Identifier.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901059<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901059<BR>
      *        3.1.3.1 Client Identifier
      * @param user_name
      *        User Name.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901071<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901071<BR>
      *        3.1.3.4 User Name
      * @param password
      *        Password.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901072<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901072<BR>
      *        3.1.3.5 Password
      * @param will
      *        Will. It contains retain, QoS, propertied, topic, and message.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901040<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901040<BR>
      *        3.1.2.5 Will Flag<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901041<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901041<BR>
      *        3.1.2.6 Will QoS<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901042<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901042<BR>
      *        3.1.2.7 Will Retain<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901060<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901060<BR>
      *        3.1.3.2 Will Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901069<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901069<BR>
      *        3.1.3.3 Will Topic<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901070<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901070<BR>
      *        3.1.3.3 Will Payload<BR>
      * @param clean_start
      *        Clean Start<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901039<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901039<BR>
      *        3.1.2.4 Clean Session
      * @param keep_alive
      *        Keep Alive<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901045<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901045<BR>
      *        3.1.2.10 Keep Alive
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901046<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901046<BR>
      *        3.1.2.11 CONNECT Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      *
      */
-    using v5_connect_handler = std::function<
-        bool(buffer client_id,
-             optional<buffer> user_name,
-             optional<buffer> password,
-             optional<will> will,
-             bool clean_start,
-             std::uint16_t keep_alive,
-             v5::properties props)
-    >;
+    using v5_connect_handler =
+        std::function<bool(buffer client_id, optional<buffer> user_name,
+            optional<buffer> password, optional<will> will, bool clean_start,
+            std::uint16_t keep_alive, v5::properties props)>;
 
     /**
      * @brief Connack handler
      * @param session_present
      *        Session present flag.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901078<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901078<BR>
      *        3.2.2.1.1 Session Present
      * @param reason_code
      *        Connect Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901079<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901079<BR>
      *        3.2.2.2 Connect Reason code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901080<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901080<BR>
      *        3.2.2.3 CONNACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_connack_handler = std::function<
-        bool(bool session_present,
-             v5::connect_reason_code reason_code,
-             v5::properties props)
-    >;
+    using v5_connack_handler = std::function<bool(bool session_present,
+        v5::connect_reason_code reason_code, v5::properties props)>;
 
     /**
      * @brief Publish handler
      * @param packet_id
      *        packet identifier<BR>
      *        If received publish's QoS is 0, packet_id is nullopt.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901108<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901108<BR>
      *        3.3.2.2 Packet Identifier
      * @param fixed_header
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901101<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901101<BR>
      *        3.3.1 Fixed header<BR>
      *        You can check the fixed header using publish functions.
      * @param topic_name
      *        Topic name<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901107<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901107<BR>
      *        3.3.2.1 Topic Name<BR>
      * @param contents
      *        Publish Payload<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901119<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901119<BR>
      *        3.3.3 PUBLISH Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901109<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901109<BR>
      *        3.3.2.3 PUBLISH Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_publish_handler = std::function<
-        bool(optional<packet_id_t> packet_id,
-             publish_options pubopts,
-             buffer topic_name,
-             buffer contents,
-             v5::properties props)
-    >;
+    using v5_publish_handler = std::function<bool(
+        optional<packet_id_t> packet_id, publish_options pubopts,
+        buffer topic_name, buffer contents, v5::properties props)>;
 
     /**
      * @brief Puback handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901123<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901123<BR>
      *        3.4.2 Variable header
      * @param reason_code
      *        PUBACK Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901124<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901124<BR>
      *        3.4.2.1 PUBACK Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901125<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901125<BR>
      *        3.4.2.2 PUBACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_puback_handler = std::function<
-        bool(packet_id_t packet_id,
-             v5::puback_reason_code reason_code,
-             v5::properties props)
-    >;
+    using v5_puback_handler = std::function<bool(packet_id_t packet_id,
+        v5::puback_reason_code reason_code, v5::properties props)>;
 
     /**
      * @brief Pubrec handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901133<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901133<BR>
      *        3.5.2 Variable header
      * @param reason_code
      *        PUBREC Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901134<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901134<BR>
      *        3.5.2.1 PUBREC Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901135<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901135<BR>
      *        3.5.2.2 PUBREC Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_pubrec_handler = std::function<
-        bool(packet_id_t packet_id,
-             v5::pubrec_reason_code reason_code,
-             v5::properties props)
-    >;
+    using v5_pubrec_handler = std::function<bool(packet_id_t packet_id,
+        v5::pubrec_reason_code reason_code, v5::properties props)>;
 
     /**
      * @brief Pubrel handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901143<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901143<BR>
      *        3.6.2 Variable header
      * @param reason_code
      *        PUBREL Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901144<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901144<BR>
      *        3.6.2.1 PUBREL Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901145<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901145<BR>
      *        3.6.2.2 PUBREL Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_pubrel_handler = std::function<
-        bool(packet_id_t packet_id,
-             v5::pubrel_reason_code reason_code,
-             v5::properties props)
-    >;
+    using v5_pubrel_handler = std::function<bool(packet_id_t packet_id,
+        v5::pubrel_reason_code reason_code, v5::properties props)>;
 
     /**
      * @brief Pubcomp handler
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901153<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901153<BR>
      *        3.7.2 Variable header
      * @param reason_code
      *        PUBCOMP Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901154<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901154<BR>
      *        3.7.2.1 PUBCOMP Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901155<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901155<BR>
      *        3.7.2.2 PUBCOMP Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_pubcomp_handler = std::function<
-        bool(packet_id_t packet_id,
-             v5::pubcomp_reason_code reason_code,
-             v5::properties props)
-    >;
+    using v5_pubcomp_handler = std::function<bool(packet_id_t packet_id,
+        v5::pubcomp_reason_code reason_code, v5::properties props)>;
 
     /**
      * @brief Subscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901163<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901163<BR>
      *        3.8.2 Variable header
      * @param entries
      *        Collection of Share Name, Topic Filter, and Subscribe Options.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901168<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901168<BR>
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901164<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901164<BR>
      *        3.8.2.1 SUBSCRIBE Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_subscribe_handler = std::function<
-        bool(packet_id_t packet_id,
-             std::vector<subscribe_entry> entries,
-             v5::properties props)
-    >;
+    using v5_subscribe_handler = std::function<bool(packet_id_t packet_id,
+        std::vector<subscribe_entry> entries, v5::properties props)>;
 
     /**
      * @brief Suback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901173<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901173<BR>
      *        3.9.2 Variable header
      * @param reasons
      *        Collection of reason_code.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901178<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901178<BR>
      *        3.9.3 SUBACK Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901174<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901174<BR>
      *        3.9.2.1 SUBACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_suback_handler = std::function<
-        bool(packet_id_t packet_id,
-             std::vector<v5::suback_reason_code> reasons,
-             v5::properties props)
-    >;
+    using v5_suback_handler = std::function<bool(packet_id_t packet_id,
+        std::vector<v5::suback_reason_code> reasons, v5::properties props)>;
 
     /**
      * @brief Unsubscribe handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901181<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901181<BR>
      *        3.10.2 Variable header
      * @param entries
      *        Collection of Share Name and Topic Filter<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901185<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901185<BR>
      *        3.10.3 UNSUBSCRIBE Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901182<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901182<BR>
      *        3.10.2.1 UNSUBSCRIBE Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_unsubscribe_handler = std::function<
-        bool(packet_id_t packet_id,
-             std::vector<unsubscribe_entry> entries,
-             v5::properties props)
-    >;
+    using v5_unsubscribe_handler = std::function<bool(packet_id_t packet_id,
+        std::vector<unsubscribe_entry> entries, v5::properties props)>;
 
     /**
      * @brief Unsuback handler
      * @param packet_id packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901189<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901189<BR>
      *        3.11.2 Variable header
      * @param reasons
      *        Collection of reason_code.<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901194<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901194<BR>
      *        3.11.3 UNSUBACK Payload
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901190<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901190<BR>
      *        3.11.2.1 UNSUBACK Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_unsuback_handler = std::function<
-        bool(packet_id_t,
-             std::vector<v5::unsuback_reason_code> reasons,
-             v5::properties props)
-    >;
+    using v5_unsuback_handler = std::function<bool(packet_id_t,
+        std::vector<v5::unsuback_reason_code> reasons, v5::properties props)>;
 
     /**
      * @brief Disconnect handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901205<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901205<BR>
      *        3.14 DISCONNECT – Disconnect notification
      * @param reason_code
      *        DISCONNECT Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901208<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901208<BR>
      *        3.14.2.1 Disconnect Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901209<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901209<BR>
      *        3.14.2.2 DISCONNECT Properties
      */
-    using v5_disconnect_handler = std::function<
-        void(v5::disconnect_reason_code reason_code,
-             v5::properties props)
-    >;
+    using v5_disconnect_handler = std::function<void(
+        v5::disconnect_reason_code reason_code, v5::properties props)>;
 
     /**
      * @brief Auth handler
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901217<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901217<BR>
      *        3.15 AUTH – Authentication exchange
      * @param reason_code
      *        AUTH Reason Code<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901220<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901220<BR>
      *        3.15.2.1 Authenticate Reason Code
      * @param props
      *        Properties<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901221<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901221<BR>
      *        3.15.2.2 AUTH Properties
-     * @return if the handler returns true, then continue receiving, otherwise quit.
+     * @return if the handler returns true, then continue receiving, otherwise
+     * quit.
      */
-    using v5_auth_handler = std::function<
-        bool(v5::auth_reason_code reason_code,
-             v5::properties props)
-    >;
-
+    using v5_auth_handler = std::function<bool(
+        v5::auth_reason_code reason_code, v5::properties props)>;
 
     // Original handlers
 
     /**
      * @brief Close handler
      *
-     * This handler is called if the client called `disconnect()` and the server closed the socket cleanly.
-     * If the socket is closed by other reasons, error_handler is called.
+     * This handler is called if the client called `disconnect()` and the server
+     * closed the socket cleanly. If the socket is closed by other reasons,
+     * error_handler is called.
      */
     using close_handler = std::function<void()>;
 
     /**
      * @brief Error handler
      *
-     * This handler is called if the socket is closed without client's `disconnect()` call.
+     * This handler is called if the socket is closed without client's
+     * `disconnect()` call.
      *
      * @param ec error code
      */
@@ -1288,10 +1440,12 @@ struct callable_overlay final : public Impl
 
     /**
      * @brief Publish response sent handler
-     *        This function is called just after puback sent on QoS1, or pubcomp sent on QoS2.
+     *        This function is called just after puback sent on QoS1, or pubcomp
+     * sent on QoS2.
      * @param packet_id
      *        packet identifier<BR>
-     *        See https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901026<BR>
+     *        See
+     * https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc3901026<BR>
      *        2.2.1 Packet Identifier
      */
     using pub_res_sent_handler = std::function<void(packet_id_t packet_id)>;
@@ -1302,7 +1456,8 @@ struct callable_overlay final : public Impl
      *        To restore the message, use restore_serialized_message().
      * @param msg publish message
      */
-    using serialize_publish_message_handler = std::function<void(basic_publish_message<sizeof(packet_id_t)> msg)>;
+    using serialize_publish_message_handler =
+        std::function<void(basic_publish_message<sizeof(packet_id_t)> msg)>;
 
     /**
      * @brief Serialize publish handler
@@ -1310,7 +1465,8 @@ struct callable_overlay final : public Impl
      *        To restore the message, use restore_serialized_message().
      * @param msg v5::publish message
      */
-    using serialize_v5_publish_message_handler = std::function<void(v5::basic_publish_message<sizeof(packet_id_t)> msg)>;
+    using serialize_v5_publish_message_handler =
+        std::function<void(v5::basic_publish_message<sizeof(packet_id_t)> msg)>;
 
     /**
      * @brief Serialize publish handler
@@ -1320,39 +1476,43 @@ struct callable_overlay final : public Impl
      * @param data      pointer to the serializing message
      * @param size      size of the serializing message
      */
-    using serialize_publish_handler = std::function<void(packet_id_t packet_id, char const* data, std::size_t size)>;
+    using serialize_publish_handler = std::function<void(
+        packet_id_t packet_id, char const* data, std::size_t size)>;
 
     /**
      * @brief Serialize pubrel handler
      *        You can serialize the pubrel message.
-     *        If your storage has already had the publish message that has the same packet_id,
-     *        then you need to replace the publish message to pubrel message.
-     *        To restore the message, use restore_serialized_message().
+     *        If your storage has already had the publish message that has the
+     * same packet_id, then you need to replace the publish message to pubrel
+     * message. To restore the message, use restore_serialized_message().
      * @param msg pubrel message
      */
-    using serialize_pubrel_message_handler = std::function<void(basic_pubrel_message<sizeof(packet_id_t)> msg)>;
+    using serialize_pubrel_message_handler =
+        std::function<void(basic_pubrel_message<sizeof(packet_id_t)> msg)>;
 
     /**
      * @brief Serialize pubrel handler
      *        You can serialize the pubrel message.
-     *        If your storage has already had the publish message that has the same packet_id,
-     *        then you need to replace the publish message to pubrel message.
-     *        To restore the message, use restore_serialized_message().
+     *        If your storage has already had the publish message that has the
+     * same packet_id, then you need to replace the publish message to pubrel
+     * message. To restore the message, use restore_serialized_message().
      * @param msg pubrel message
      */
-    using serialize_v5_pubrel_message_handler = std::function<void(v5::basic_pubrel_message<sizeof(packet_id_t)> msg)>;
+    using serialize_v5_pubrel_message_handler =
+        std::function<void(v5::basic_pubrel_message<sizeof(packet_id_t)> msg)>;
 
     /**
      * @brief Serialize pubrel handler
      *        You can serialize the pubrel message.
-     *        If your storage has already had the publish message that has the same packet_id,
-     *        then you need to replace the publish message to pubrel message.
-     *        To restore the message, use restore_serialized_message().
+     *        If your storage has already had the publish message that has the
+     * same packet_id, then you need to replace the publish message to pubrel
+     * message. To restore the message, use restore_serialized_message().
      * @param packet_id packet identifier of the serializing message
      * @param data      pointer to the serializing message
      * @param size      size of the serializing message
      */
-    using serialize_pubrel_handler = std::function<void(packet_id_t packet_id, char const* data, std::size_t size)>;
+    using serialize_pubrel_handler = std::function<void(
+        packet_id_t packet_id, char const* data, std::size_t size)>;
 
     /**
      * @brief Remove serialized message
@@ -1362,7 +1522,8 @@ struct callable_overlay final : public Impl
 
     /**
      * @brief Pre-send handler
-     *        This handler is called when any mqtt control packet is decided to send.
+     *        This handler is called when any mqtt control packet is decided to
+     * send.
      */
     using pre_send_handler = std::function<void()>;
 
@@ -1373,18 +1534,18 @@ struct callable_overlay final : public Impl
      * @param remaining length
      * @return true if check is success, otherwise false
      */
-    using is_valid_length_handler =
-        std::function<bool(control_packet_type packet_type, std::size_t remaining_length)>;
+    using is_valid_length_handler = std::function<bool(
+        control_packet_type packet_type, std::size_t remaining_length)>;
 
     /**
      * @brief next read handler
-     *        This handler is called when the current mqtt message has been processed.
-     * @param func A callback function that is called when async operation will finish.
+     *        This handler is called when the current mqtt message has been
+     * processed.
+     * @param func A callback function that is called when async operation will
+     * finish.
      */
     using mqtt_message_processed_handler =
         std::function<void(any session_life_keeper)>;
-
-
 
     // MQTT Common handlers
 
@@ -1404,23 +1565,17 @@ struct callable_overlay final : public Impl
         h_pingresp_ = force_move(h);
     }
 
-
     /**
      * @brief Get pingreq handler
      * @return handler
      */
-    pingreq_handler const& get_pingreq_handler() const {
-        return h_pingreq_;
-    }
+    pingreq_handler const& get_pingreq_handler() const { return h_pingreq_; }
 
     /**
      * @brief Get pingresp handler
      * @return handler
      */
-    pingresp_handler const& get_pingresp_handler() const {
-        return h_pingresp_;
-    }
-
+    pingresp_handler const& get_pingresp_handler() const { return h_pingresp_; }
 
     // MQTT v3_1_1 handlers
 
@@ -1500,7 +1655,8 @@ struct callable_overlay final : public Impl
      * @brief Set unsubscribe handler
      * @param h handler
      */
-    void set_unsubscribe_handler(unsubscribe_handler h = unsubscribe_handler()) {
+    void set_unsubscribe_handler(
+        unsubscribe_handler h = unsubscribe_handler()) {
         h_unsubscribe_ = force_move(h);
     }
 
@@ -1524,57 +1680,43 @@ struct callable_overlay final : public Impl
      * @brief Get connect handler
      * @return handler
      */
-    connect_handler const& get_connect_handler() const {
-        return h_connect_;
-    }
+    connect_handler const& get_connect_handler() const { return h_connect_; }
 
     /**
      * @brief Get connack handler
      * @return handler
      */
-    connack_handler const& get_connack_handler() const {
-        return h_connack_;
-    }
+    connack_handler const& get_connack_handler() const { return h_connack_; }
 
     /**
      * @brief Set publish handler
      * @return handler
      */
-    publish_handler const& get_publish_handler() const {
-        return h_publish_;
-    }
+    publish_handler const& get_publish_handler() const { return h_publish_; }
 
     /**
      * @brief Get puback handler
      * @return handler
      */
-    puback_handler const& get_puback_handler() const {
-        return h_puback_;
-    }
+    puback_handler const& get_puback_handler() const { return h_puback_; }
 
     /**
      * @brief Get pubrec handler
      * @return handler
      */
-    pubrec_handler const& get_pubrec_handler() const {
-        return h_pubrec_;
-    }
+    pubrec_handler const& get_pubrec_handler() const { return h_pubrec_; }
 
     /**
      * @brief Get pubrel handler
      * @return handler
      */
-    pubrel_handler const& get_pubrel_handler() const {
-        return h_pubrel_;
-    }
+    pubrel_handler const& get_pubrel_handler() const { return h_pubrel_; }
 
     /**
      * @brief Get pubcomp handler
      * @return handler
      */
-    pubcomp_handler const& get_pubcomp_handler() const {
-        return h_pubcomp_;
-    }
+    pubcomp_handler const& get_pubcomp_handler() const { return h_pubcomp_; }
 
     /**
      * @brief Get subscribe handler
@@ -1588,9 +1730,7 @@ struct callable_overlay final : public Impl
      * @brief Get suback handler
      * @return handler
      */
-    suback_handler const& get_suback_handler() const {
-        return h_suback_;
-    }
+    suback_handler const& get_suback_handler() const { return h_suback_; }
 
     /**
      * @brief Get unsubscribe handler
@@ -1604,9 +1744,7 @@ struct callable_overlay final : public Impl
      * @brief Get unsuback handler
      * @return handler
      */
-    unsuback_handler const& get_unsuback_handler() const {
-        return h_unsuback_;
-    }
+    unsuback_handler const& get_unsuback_handler() const { return h_unsuback_; }
 
     /**
      * @brief Get disconnect handler
@@ -1678,7 +1816,8 @@ struct callable_overlay final : public Impl
      * @brief Set subscribe handler
      * @param h handler
      */
-    void set_v5_subscribe_handler(v5_subscribe_handler h = v5_subscribe_handler()) {
+    void set_v5_subscribe_handler(
+        v5_subscribe_handler h = v5_subscribe_handler()) {
         h_v5_subscribe_ = force_move(h);
     }
 
@@ -1694,7 +1833,8 @@ struct callable_overlay final : public Impl
      * @brief Set unsubscribe handler
      * @param h handler
      */
-    void set_v5_unsubscribe_handler(v5_unsubscribe_handler h = v5_unsubscribe_handler()) {
+    void set_v5_unsubscribe_handler(
+        v5_unsubscribe_handler h = v5_unsubscribe_handler()) {
         h_v5_unsubscribe_ = force_move(h);
     }
 
@@ -1702,7 +1842,8 @@ struct callable_overlay final : public Impl
      * @brief Set unsuback handler
      * @param h handler
      */
-    void set_v5_unsuback_handler(v5_unsuback_handler h = v5_unsuback_handler()) {
+    void set_v5_unsuback_handler(
+        v5_unsuback_handler h = v5_unsuback_handler()) {
         h_v5_unsuback_ = force_move(h);
     }
 
@@ -1710,7 +1851,8 @@ struct callable_overlay final : public Impl
      * @brief Set disconnect handler
      * @param h handler
      */
-    void set_v5_disconnect_handler(v5_disconnect_handler h = v5_disconnect_handler()) {
+    void set_v5_disconnect_handler(
+        v5_disconnect_handler h = v5_disconnect_handler()) {
         h_v5_disconnect_ = force_move(h);
     }
 
@@ -1758,9 +1900,7 @@ struct callable_overlay final : public Impl
      * @brief Get pubrec handler
      * @return handler
      */
-    v5_pubrec_handler const& get_v5__handler() const {
-        return h_v5_pubrec_;
-    }
+    v5_pubrec_handler const& get_v5__handler() const { return h_v5_pubrec_; }
 
     /**
      * @brief Get pubrel handler
@@ -1822,10 +1962,7 @@ struct callable_overlay final : public Impl
      * @brief Get auth handler
      * @return handler
      */
-    v5_auth_handler const& get_v5_auth_handler() const {
-        return h_v5_auth_;
-    }
-
+    v5_auth_handler const& get_v5_auth_handler() const { return h_v5_auth_; }
 
     // Original handlers
 
@@ -1833,7 +1970,8 @@ struct callable_overlay final : public Impl
      * @brief Set pubcomp handler
      * @param h handler
      */
-    void set_pub_res_sent_handler(pub_res_sent_handler h = pub_res_sent_handler()) {
+    void set_pub_res_sent_handler(
+        pub_res_sent_handler h = pub_res_sent_handler()) {
         h_pub_res_sent_ = force_move(h);
     }
 
@@ -1843,8 +1981,7 @@ struct callable_overlay final : public Impl
      * @param h_pubrel serialize handler for pubrel message
      * @param h_remove remove handler for serialized message
      */
-    void set_serialize_handlers(
-        serialize_publish_message_handler h_publish,
+    void set_serialize_handlers(serialize_publish_message_handler h_publish,
         serialize_pubrel_message_handler h_pubrel,
         serialize_remove_handler h_remove) {
         h_serialize_publish_ = force_move(h_publish);
@@ -1873,21 +2010,19 @@ struct callable_overlay final : public Impl
      * @param h_pubrel serialize handler for pubrel message
      * @param h_remove remove handler for serialized message
      */
-    void set_serialize_handlers(
-        serialize_publish_handler h_publish,
-        serialize_pubrel_handler h_pubrel,
-        serialize_remove_handler h_remove) {
+    void set_serialize_handlers(serialize_publish_handler h_publish,
+        serialize_pubrel_handler h_pubrel, serialize_remove_handler h_remove) {
         h_serialize_publish_ =
-            [h_publish = force_move(h_publish)]
-            (basic_publish_message<sizeof(packet_id_t)> msg) {
+            [h_publish = force_move(h_publish)](
+                basic_publish_message<sizeof(packet_id_t)> msg) {
                 if (h_publish) {
                     auto buf = msg.continuous_buffer();
                     h_publish(msg.packet_id(), buf.data(), buf.size());
                 }
             };
         h_serialize_pubrel_ =
-            [h_pubrel = force_move(h_pubrel)]
-            (basic_pubrel_message<sizeof(packet_id_t)> msg) {
+            [h_pubrel = force_move(h_pubrel)](
+                basic_pubrel_message<sizeof(packet_id_t)> msg) {
                 if (h_pubrel) {
                     auto buf = msg.continuous_buffer();
                     h_pubrel(msg.packet_id(), buf.data(), buf.size());
@@ -1902,21 +2037,19 @@ struct callable_overlay final : public Impl
      * @param h_pubrel serialize handler for pubrel message
      * @param h_remove remove handler for serialized message
      */
-    void set_v5_serialize_handlers(
-        serialize_publish_handler h_publish,
-        serialize_pubrel_handler h_pubrel,
-        serialize_remove_handler h_remove) {
+    void set_v5_serialize_handlers(serialize_publish_handler h_publish,
+        serialize_pubrel_handler h_pubrel, serialize_remove_handler h_remove) {
         h_serialize_v5_publish_ =
-            [h_publish = force_move(h_publish)]
-            (v5::basic_publish_message<sizeof(packet_id_t)> msg) {
+            [h_publish = force_move(h_publish)](
+                v5::basic_publish_message<sizeof(packet_id_t)> msg) {
                 if (h_publish) {
                     auto buf = msg.continuous_buffer();
                     h_publish(msg.packet_id(), buf.data(), buf.size());
                 }
             };
         h_serialize_v5_pubrel_ =
-            [h_pubrel = force_move(h_pubrel)]
-            (v5::basic_pubrel_message<sizeof(packet_id_t)> msg) {
+            [h_pubrel = force_move(h_pubrel)](
+                v5::basic_pubrel_message<sizeof(packet_id_t)> msg) {
                 if (h_pubrel) {
                     auto buf = msg.continuous_buffer();
                     h_pubrel(msg.packet_id(), buf.data(), buf.size());
@@ -1948,7 +2081,8 @@ struct callable_overlay final : public Impl
      * @brief Set check length handler
      * @param h handler
      */
-    void set_is_valid_length_handler(is_valid_length_handler h = is_valid_length_handler()) {
+    void set_is_valid_length_handler(
+        is_valid_length_handler h = is_valid_length_handler()) {
         h_is_valid_length_ = force_move(h);
     }
 
@@ -1964,7 +2098,8 @@ struct callable_overlay final : public Impl
      * @brief Get serialize publish handler
      * @return handler
      */
-    serialize_publish_message_handler const& get_serialize_publish_message_handler() const {
+    serialize_publish_message_handler const&
+    get_serialize_publish_message_handler() const {
         return h_serialize_publish_;
     }
 
@@ -1972,7 +2107,8 @@ struct callable_overlay final : public Impl
      * @brief Get serialize pubrel handler
      * @return handler
      */
-    serialize_pubrel_message_handler const& get_serialize_pubrel_message_handler() const {
+    serialize_pubrel_message_handler const&
+    get_serialize_pubrel_message_handler() const {
         return h_serialize_pubrel_;
     }
 
@@ -1980,7 +2116,8 @@ struct callable_overlay final : public Impl
      * @brief Get serialize publish handler
      * @return handler
      */
-    serialize_v5_publish_message_handler const& get_serialize_v5_publish_message_handler() const {
+    serialize_v5_publish_message_handler const&
+    get_serialize_v5_publish_message_handler() const {
         return h_serialize_v5_publish_;
     }
 
@@ -1988,7 +2125,8 @@ struct callable_overlay final : public Impl
      * @brief Get serialize pubrel handler
      * @return handler
      */
-    serialize_v5_pubrel_message_handler const& get_serialize_v5_pubrel_message_handler() const {
+    serialize_v5_pubrel_message_handler const&
+    get_serialize_v5_pubrel_message_handler() const {
         return h_serialize_v5_pubrel_;
     }
 
@@ -2004,9 +2142,7 @@ struct callable_overlay final : public Impl
      * @brief Get pre-send handler
      * @return handler
      */
-    pre_send_handler const& get_pre_send_handler() const {
-        return h_pre_send_;
-    }
+    pre_send_handler const& get_pre_send_handler() const { return h_pre_send_; }
 
     /**
      * @brief Get check length handler
@@ -2032,8 +2168,7 @@ struct callable_overlay final : public Impl
         mqtt_message_processed_handler h = mqtt_message_processed_handler()) {
         if (h) {
             h_mqtt_message_processed_ = force_move(h);
-        }
-        else {
+        } else {
             h_mqtt_message_processed_ = {};
         }
     }
@@ -2066,19 +2201,15 @@ struct callable_overlay final : public Impl
      * @brief Get close handler
      * @return handler
      */
-    close_handler get_close_handler() const {
-        return h_close_;
-    }
+    close_handler get_close_handler() const { return h_close_; }
 
     /**
      * @brief Get error handler
      * @return handler
      */
-    error_handler get_error_handler() const {
-        return h_error_;
-    }
+    error_handler get_error_handler() const { return h_error_; }
 
-private:
+   private:
     // MQTT common handlers
     pingreq_handler h_pingreq_;
     pingresp_handler h_pingresp_;
@@ -2124,8 +2255,8 @@ private:
     pre_send_handler h_pre_send_;
     is_valid_length_handler h_is_valid_length_;
     mqtt_message_processed_handler h_mqtt_message_processed_;
-}; // callable_overlay
+};  // callable_overlay
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_CALLABLE_OVERLAY_HPP
+#endif  // MQTT_CALLABLE_OVERLAY_HPP

@@ -7,14 +7,13 @@
 #if !defined(MQTT_ERROR_CODE_HPP)
 #define MQTT_ERROR_CODE_HPP
 
-#include <mqtt/namespace.hpp>
-
 #include <boost/system/error_code.hpp>
+#include <mqtt/namespace.hpp>
 
 namespace MQTT_NS {
 
 using error_code = boost::system::error_code;
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_ERROR_CODE_HPP
+#endif  // MQTT_ERROR_CODE_HPP

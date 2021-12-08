@@ -18,10 +18,8 @@ inline char const* get_pointer(as::const_buffer const& cb) {
     return static_cast<char const*>(cb.data());
 }
 
-inline std::size_t get_size(as::const_buffer const& cb) {
-    return cb.size();
-}
+inline std::size_t get_size(as::const_buffer const& cb) { return cb.size(); }
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_CONST_BUFFER_UTIL_HPP
+#endif  // MQTT_CONST_BUFFER_UTIL_HPP

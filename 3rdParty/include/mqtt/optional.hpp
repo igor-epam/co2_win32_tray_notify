@@ -15,7 +15,7 @@
 
 #include <boost/optional.hpp>
 
-#endif // defined(MQTT_STD_VARIANT)
+#endif  // defined(MQTT_STD_VARIANT)
 
 #include <mqtt/namespace.hpp>
 
@@ -23,8 +23,8 @@ namespace MQTT_NS {
 
 #if defined(MQTT_STD_OPTIONAL)
 
-using std::optional;
 using std::nullopt_t;
+using std::optional;
 using in_place_t = std::in_place_t;
 static constexpr auto in_place_init = in_place_t{};
 static constexpr auto nullopt = std::nullopt;
@@ -36,8 +36,8 @@ using nullopt_t = boost::none_t;
 using boost::in_place_init;
 static const auto nullopt = boost::none;
 
-#endif // defined(MQTT_STD_OPTIONAL)
+#endif  // defined(MQTT_STD_OPTIONAL)
 
-} // namespace MQTT_NS
+}  // namespace MQTT_NS
 
-#endif // MQTT_OPTIONAL_HPP
+#endif  // MQTT_OPTIONAL_HPP
