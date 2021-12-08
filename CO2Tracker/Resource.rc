@@ -44,6 +44,8 @@ BEGIN
     BEGIN
         MENUITEM "force update",                ID__FORCEUPDATE
         MENUITEM SEPARATOR
+        MENUITEM "reconnect",                   ID__RECONNECT
+        MENUITEM SEPARATOR
         MENUITEM "exit",                        ID__EXIT
     END
 END

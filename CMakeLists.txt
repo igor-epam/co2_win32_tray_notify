@@ -65,4 +65,7 @@ SET (TRACKER_BOOST_COMPONENTS system date_time program_options)
 FIND_PACKAGE (Boost 1.77.0 REQUIRED COMPONENTS ${TRACKER_BOOST_COMPONENTS} CONFIG)
 
 # Include sub-projects.
-add_subdirectory ("CO2Tracker")
+list(APPEND CMAKE_MODULE_PATH 3rdParty/lib/cmake/mqtt_cpp_iface)
+list(APPEND CMAKE_PREFIX_PATH 3rdParty/lib/cmake/mqtt_cpp_iface)
+find_package(mqtt_cpp_iface REQUIRED CONFIG)
+add_subdirectory (CO2Tracker)

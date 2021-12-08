@@ -4,12 +4,15 @@
 #pragma once
 
 #include "TrayWindow.h"
-
+#include "StateTranslator.h"
 #include <Windows.h>
 
+#include <memory>
 
 namespace co2
 {
+class MqttClient;
+
     class CO2Tracker final
     {
     public:
@@ -37,8 +40,10 @@ namespace co2
                 WPARAM wparam,
                 LPARAM lparam);
 
+        StateTranslator translator_;
         HINSTANCE instance_;
         HWND hwnd_;
         TrayWindow tray_icon_;
+        std::unique_ptr<MqttClient> _mqtt_client_;
     };
 }
