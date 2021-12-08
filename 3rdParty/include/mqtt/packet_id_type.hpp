@@ -20,6 +20,6 @@ using make_packet_id = make_two_or_four_byte<PacketIdBytes>;
 template <std::size_t PacketIdBytes>
 using add_packet_id_to_buf = add_two_or_four_byte_to_buf<PacketIdBytes>;
 
-}  // namespace MQTT_NS
+} // namespace MQTT_NS
 
-#endif  // MQTT_PACKET_ID_TYPE_HPP
+#endif // MQTT_PACKET_ID_TYPE_HPP

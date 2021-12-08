@@ -7,19 +7,21 @@
 #if !defined(MQTT_MOVE_HPP)
 #define MQTT_MOVE_HPP
 
-#include <mqtt/namespace.hpp>
-#include <type_traits>
 #include <utility>
+#include <type_traits>
+
+#include <mqtt/namespace.hpp>
 
 namespace MQTT_NS {
 
 template <typename T>
-constexpr typename std::remove_reference_t<T>&& force_move(T&& t) {
-    static_assert(!std::is_const<std::remove_reference_t<T>>::value,
-        "T is const. Fallback to copy.");
+constexpr
+typename std::remove_reference_t<T>&&
+force_move(T&& t) {
+    static_assert(!std::is_const<std::remove_reference_t<T>>::value, "T is const. Fallback to copy.");
     return std::move(t);
 }
 
-}  // namespace MQTT_NS
+} // namespace MQTT_NS
 
-#endif  // MQTT_MOVE_HPP
+#endif // MQTT_MOVE_HPP

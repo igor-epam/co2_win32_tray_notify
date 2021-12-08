@@ -7,13 +7,15 @@
 #if !defined(MQTT_VARIABLE_LENGTH_HPP)
 #define MQTT_VARIABLE_LENGTH_HPP
 
-#include <mqtt/exception.hpp>
-#include <mqtt/namespace.hpp>
 #include <string>
+
+#include <mqtt/namespace.hpp>
+#include <mqtt/exception.hpp>
 
 namespace MQTT_NS {
 
-inline std::string variable_bytes(std::size_t size) {
+inline std::string
+variable_bytes(std::size_t size) {
     std::string bytes;
     if (size > 0xfffffff) return bytes;
     while (size > 127) {
@@ -25,18 +27,19 @@ inline std::string variable_bytes(std::size_t size) {
 }
 
 template <typename Container>
-inline void variable_push(Container& c, std::size_t size) {
+inline void
+variable_push(Container& c, std::size_t size) {
     if (size > 0xfffffff) return;
     while (size > 127) {
-        c.push_back(static_cast<typename Container::value_type>(
-            (size & 0b01111111) | 0b10000000));
+        c.push_back(static_cast<typename Container::value_type>((size & 0b01111111) | 0b10000000));
         size >>= 7;
     }
     c.push_back(size & 0b01111111);
 }
 
 template <typename T>
-constexpr std::tuple<std::size_t, std::size_t> variable_length(T const& bytes) {
+constexpr std::tuple<std::size_t, std::size_t>
+variable_length(T const& bytes) {
     std::size_t len = 0;
     std::size_t mul = 1;
     std::size_t consumed = 0;
@@ -51,8 +54,8 @@ constexpr std::tuple<std::size_t, std::size_t> variable_length(T const& bytes) {
 }
 
 template <typename Iterator>
-constexpr std::tuple<std::size_t, std::size_t> variable_length(
-    Iterator b, Iterator e) {
+constexpr std::tuple<std::size_t, std::size_t>
+variable_length(Iterator b, Iterator e) {
     std::size_t len = 0;
     std::size_t mul = 1;
     std::size_t consumed = 0;
@@ -66,6 +69,6 @@ constexpr std::tuple<std::size_t, std::size_t> variable_length(
     return {len, consumed};
 }
 
-}  // namespace MQTT_NS
+} // namespace MQTT_NS
 
-#endif  // MQTT_VARIABLE_LENGTH_HPP
+#endif // MQTT_VARIABLE_LENGTH_HPP

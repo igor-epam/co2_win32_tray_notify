@@ -9,6 +9,7 @@
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/strand.hpp>
+
 #include <mqtt/namespace.hpp>
 
 namespace MQTT_NS {
@@ -21,12 +22,12 @@ namespace as = boost::asio;
 // Use standard executor style strand
 using strand = as::strand<as::io_context::executor_type>;
 
-#else  // defined(MQTT_NO_TS_EXECUTORS)
+#else // defined(MQTT_NO_TS_EXECUTORS)
 
 // Use networking TS style strand
 using strand = as::io_context::strand;
 
-#endif  // defined(MQTT_NO_TS_EXECUTORS)
-}  // namespace MQTT_NS
+#endif // defined(MQTT_NO_TS_EXECUTORS)
+}
 
-#endif  // MQTT_STRAND_HPP
+#endif // MQTT_STRAND_HPP

@@ -9,9 +9,10 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <mqtt/four_byte_util.hpp>
+
 #include <mqtt/namespace.hpp>
 #include <mqtt/two_byte_util.hpp>
+#include <mqtt/four_byte_util.hpp>
 
 namespace MQTT_NS {
 
@@ -66,6 +67,6 @@ struct add_two_or_four_byte_to_buf<4> {
     }
 };
 
-}  // namespace MQTT_NS
+} // namespace MQTT_NS
 
-#endif  // MQTT_TWO_OR_FOUR_BYTE_UTIL_HPP
+#endif // MQTT_TWO_OR_FOUR_BYTE_UTIL_HPP

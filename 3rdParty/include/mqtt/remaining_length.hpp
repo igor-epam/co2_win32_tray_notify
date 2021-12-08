@@ -13,23 +13,24 @@
 
 namespace MQTT_NS {
 
-inline std::string remaining_bytes(std::size_t size) {
+inline std::string
+remaining_bytes(std::size_t size) {
     std::string bytes = variable_bytes(size);
     if (bytes.empty() || bytes.size() > 4) throw remaining_length_error();
     return bytes;
 }
 
-constexpr std::tuple<std::size_t, std::size_t> remaining_length(
-    string_view bytes) {
+constexpr std::tuple<std::size_t, std::size_t>
+remaining_length(string_view bytes) {
     return variable_length(bytes);
 }
 
 template <typename Iterator>
-constexpr std::tuple<std::size_t, std::size_t> remaining_length(
-    Iterator b, Iterator e) {
+constexpr std::tuple<std::size_t, std::size_t>
+remaining_length(Iterator b, Iterator e) {
     return variable_length(b, e);
 }
 
-}  // namespace MQTT_NS
+} // namespace MQTT_NS
 
-#endif  // MQTT_REMAINING_LENGTH_HPP
+#endif // MQTT_REMAINING_LENGTH_HPP

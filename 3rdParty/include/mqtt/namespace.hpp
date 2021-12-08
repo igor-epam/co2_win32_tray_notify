@@ -9,6 +9,6 @@
 
 #if !defined(MQTT_NS)
 #define MQTT_NS mqtt
-#endif  // !defined(MQTT_NS)
+#endif // !defined(MQTT_NS)
 
-#endif  // MQTT_NAMESPACE_HPP
+#endif // MQTT_NAMESPACE_HPP
