@@ -3,6 +3,10 @@
 
 #include "CO2Tracker.h"
 
+#include "CredentialsManager.h"
+#include "MqttClient.h"
+#include "SettingsManager.h"
+#include "Strings.h"
 #include "WinApiException.h"
 // we need commctrl v6 for LoadIconMetric()
 #pragma comment(linker, \
@@ -13,8 +17,10 @@
 #include <commctrl.h>
 #include <shellapi.h>
 #include <strsafe.h>
+#define _WINSOCKAPI_
 #include <windows.h>
 #include <windowsx.h>
+#include <winsock2.h>
 
 #include <cstring>
 #include <exception>
@@ -29,7 +35,7 @@ using namespace co2;
 namespace {
 
 UINT constexpr WMAPP_NOTIFYCALLBACK = WM_APP + 1;
-class __declspec(uuid("1b1793c0-7522-4263-b290-af8ec052dc64")) CO2Icon;
+class __declspec(uuid("1b1793c0-7522-4263-b290-af8ec052dc65")) CO2Icon;
 auto constexpr ClassName = L"CO2Tracker";
 
 void RegisterWindowClass(
@@ -73,12 +79,52 @@ void ShowContextMenu(HINSTANCE hinstance, HWND hwnd, POINT pt) {
     }
 }
 
+std::unique_ptr<MqttClient> CreateMqttClient(
+    StateTranslator& translator, TrayWindow& tray_window) {
+    auto settings = SettingsManager::GetSettings();
+    auto auth_info = CredentialManager::GetInstance().GetAuthInfo(
+        std::wstring(L"co2tracker:") + settings.mqtt_broker_,
+        settings.mqtt_broker_);
+    if (!auth_info) {
+        auto const tray_state = translator.NoCredentials();
+        tray_window.UpdateIcon(
+            tray_state.style_, tray_state.baloon_, tray_state.text_);
+        return nullptr;
+    }
+    auto on_update = [&](double value) {
+        auto new_state = translator.ToTrayState(value);
+        tray_window.UpdateIcon(
+            new_state.style_, new_state.baloon_, new_state.text_);
+    };
+
+    auto on_disconnect = [&](bool user_choise) {
+        auto const tray_state = translator.ConnectionLost();
+        tray_window.UpdateIcon(tray_state.style_,
+            user_choise ? std::nullopt : tray_state.baloon_, tray_state.text_);
+    };
+
+    auto on_connect = [&]() {
+        auto const tray_state = translator.ConnectedWaitingForData();
+        tray_window.UpdateIcon(
+            tray_state.style_, tray_state.baloon_, tray_state.text_);
+    };
+
+    return std::make_unique<MqttClient>(std::move(settings.mqtt_broker_),
+        settings.port_, std::move(auth_info->name_),
+        std::move(auth_info->password_), std::move(settings.state_topic_),
+        std::move(settings.query_topic_), std::move(settings.will_topic_),
+        std::move(on_update), std::move(on_connect), std::move(on_disconnect));
+}
+
 }  // namespace
 
 CO2Tracker::CO2Tracker(HINSTANCE instance)
-    : instance_(instance),
+    : translator_(),
+      instance_(instance),
       hwnd_(createMainWindow()),
-      tray_icon_(instance_, hwnd_, __uuidof(CO2Icon), WMAPP_NOTIFYCALLBACK) {}
+      tray_icon_(instance_, hwnd_, __uuidof(CO2Icon), WMAPP_NOTIFYCALLBACK,
+          translator_),
+      _mqtt_client_(CreateMqttClient(translator_, tray_icon_)) {}
 
 HWND CO2Tracker::createMainWindow() {
     RegisterWindowClass(instance_, &CO2Tracker::WindowProc, ClassName);
@@ -100,14 +146,14 @@ int APIENTRY wWinMain(
     HINSTANCE hInstance, HINSTANCE, PWSTR /*lpCmdLine*/, int /*nCmdShow*/) {
     try {
         CO2Tracker tracker(hInstance);
+
         MSG msg;
         while (GetMessage(&msg, NULL, 0, 0)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
     } catch (std::exception const& ex) {
-        MessageBoxW(NULL, L"Startup error",
-            reinterpret_cast<wchar_t const*>(ex.what()), MB_OK);
+        MessageBoxW(NULL, L"Startup error", s2ws(ex.what()).c_str(), MB_OK);
     }
     return 0;
 }
@@ -132,6 +178,18 @@ LRESULT CALLBACK CO2Tracker::windowProc(
             // Parse the menu selections:
 
             switch (wmId) {
+                case ID__RECONNECT:
+                    if (_mqtt_client_) {
+                        _mqtt_client_->Stop();
+                        _mqtt_client_ =
+                            CreateMqttClient(translator_, tray_icon_);
+                    }
+                    break;
+                case ID__FORCEUPDATE:
+                    if (_mqtt_client_) {
+                        _mqtt_client_->ForceQuery();
+                    }
+                    break;
                 case ID__EXIT:
                     DestroyWindow(hwnd);
                     break;
@@ -146,6 +204,10 @@ LRESULT CALLBACK CO2Tracker::windowProc(
                     POINT const pt = {LOWORD(wparam), HIWORD(wparam)};
                     ShowContextMenu(instance_, hwnd, pt);
                 } break;
+                case NIN_BALLOONTIMEOUT:
+                case NIN_BALLOONUSERCLICK:
+                    tray_icon_.Redraw();
+                    break;
             }
             break;
         }

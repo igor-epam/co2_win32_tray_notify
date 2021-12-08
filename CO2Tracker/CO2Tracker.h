@@ -3,42 +3,38 @@
 
 #pragma once
 
-#include "TrayWindow.h"
-
+#define _WINSOCKAPI_
 #include <Windows.h>
 
+#include <memory>
 
-namespace co2
-{
-    class CO2Tracker final
-    {
-    public:
-        CO2Tracker(HINSTANCE instance);
-        ~CO2Tracker() = default;
+#include "StateTranslator.h"
+#include "TrayWindow.h"
 
-        CO2Tracker(CO2Tracker const&) = delete;
-        CO2Tracker& operator=(CO2Tracker const&) = delete;
+namespace co2 {
+class MqttClient;
 
-        static LRESULT CALLBACK
-            WindowProc(
-                HWND hwnd,
-                UINT msg,
-                WPARAM wparam,
-                LPARAM lparam);
+class CO2Tracker final {
+   public:
+    CO2Tracker(HINSTANCE instance);
+    ~CO2Tracker() = default;
 
-    private:
+    CO2Tracker(CO2Tracker const&) = delete;
+    CO2Tracker& operator=(CO2Tracker const&) = delete;
 
-        HWND createMainWindow();
+    static LRESULT CALLBACK WindowProc(
+        HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-        LRESULT CALLBACK
-            windowProc(
-                HWND hwnd,
-                UINT msg,
-                WPARAM wparam,
-                LPARAM lparam);
+   private:
+    HWND createMainWindow();
 
-        HINSTANCE instance_;
-        HWND hwnd_;
-        TrayWindow tray_icon_;
-    };
-}
+    LRESULT CALLBACK windowProc(
+        HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+    StateTranslator translator_;
+    HINSTANCE instance_;
+    HWND hwnd_;
+    TrayWindow tray_icon_;
+    std::unique_ptr<MqttClient> _mqtt_client_;
+};
+}  // namespace co2
