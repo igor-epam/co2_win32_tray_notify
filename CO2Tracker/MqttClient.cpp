@@ -96,9 +96,9 @@ void MqttClient::on_publish(std::string_view topic, std::string_view data) {
             on_update_(value);
         }
     } else if (topic == will_topic_) {
-        if (data == "on") {
+        if (data == "online") {
             on_connect_();
-        } else if (data == "off") {
+        } else if (data == "offline") {
             disconnected();
         }
     }
