@@ -52,12 +52,16 @@ MqttClient::MqttClient(std::wstring host, int port, std::wstring user,
                   }
                   return true;
               });
+          client->connect();
 
           return client;
       }()),
       thread_([&]() mutable {
-          client_->connect();
-          ioc_.run();
+          try {
+              ioc_.run();
+          } catch (std::exception const& /*ex*/) {
+
+          }
       }) {}
 
 MqttClient::~MqttClient() {

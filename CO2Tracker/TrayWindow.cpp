@@ -47,19 +47,20 @@ DWORD ToBaloonWin32Slyte(BaloonStyle style) {
     return NIIF_USER;
 }
 
+
 void ShowBaloon(HINSTANCE h_instance, GUID guid, std::wstring_view title,
-    std::wstring_view message, LPWSTR icon) {
+    std::wstring_view message, LPWSTR icon, DWORD type) {
     NOTIFYICONDATA nid = {sizeof(nid)};
     nid.uFlags = NIF_INFO | NIF_GUID;
     nid.guidItem = guid;
-    nid.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON;
+    nid.dwInfoFlags = type | NIIF_LARGE_ICON;
     std::memcpy(nid.szInfoTitle, title.data(), title.size() * sizeof(WCHAR));
     std::memcpy(nid.szInfo, message.data(), message.size() * sizeof(WCHAR));
-    ::LoadIconMetric(h_instance, icon, LIM_LARGE, &nid.hBalloonIcon);
+    //::LoadIconMetric(h_instance, icon, LIM_LARGE, &nid.hBalloonIcon);
     if (!Shell_NotifyIcon(NIM_MODIFY, &nid)) {
         throw WinApiException(L"Unable to show baloon.");
     }
-    ::DestroyIcon(nid.hBalloonIcon);
+    //::DestroyIcon(nid.hBalloonIcon);
 }
 
 LPWSTR StyleToId(TrayIconStyle style) {
@@ -136,14 +137,14 @@ void TrayWindow::post_task(State new_state) {
 void TrayWindow::draw_new_state() {
     if (task_) {
         std::lock_guard lock(state_mutex_);
-        auto const inon_id = StyleToId(task_->tray_);
+        auto const icon_id = StyleToId(task_->tray_);
         ShowNotificationIcon(
-            h_instance_, hwnd_, guid_, message_id_, task_->text_, inon_id);
+            h_instance_, hwnd_, guid_, message_id_, task_->text_, icon_id);
         if (task_->baloon_) {
             auto const ballon_win32_style =
                 ToBaloonWin32Slyte(task_->baloon_->style_);
-            ShowBaloon(
-                h_instance_, guid_, L"", task_->baloon_->message_, inon_id);
+            ShowBaloon(h_instance_, guid_, L"", task_->baloon_->message_,
+                icon_id, ballon_win32_style);
         }
         state_ = std::move(task_);
         task_.reset();
