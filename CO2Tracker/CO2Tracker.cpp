@@ -35,7 +35,7 @@ using namespace co2;
 namespace {
 
 UINT constexpr WMAPP_NOTIFYCALLBACK = WM_APP + 1;
-class __declspec(uuid("1b1793c0-7522-4263-b290-af8ec052dc65")) CO2Icon;
+class __declspec(uuid("1b1793c0-7522-4263-b290-af8ec052dc67")) CO2Icon;
 auto constexpr ClassName = L"CO2Tracker";
 
 void RegisterWindowClass(
@@ -153,7 +153,7 @@ int APIENTRY wWinMain(
             DispatchMessage(&msg);
         }
     } catch (std::exception const& ex) {
-        MessageBoxW(NULL, L"Startup error", s2ws(ex.what()).c_str(), MB_OK);
+        MessageBoxW(NULL, s2ws(ex.what()).c_str(), L"Startup error", MB_OK);
     }
     return 0;
 }

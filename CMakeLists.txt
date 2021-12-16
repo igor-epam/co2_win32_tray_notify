@@ -5,14 +5,14 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("CO2Tracker")
 
-SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 SET(CXX_FLAGS_LIST
     "/Zi"
     "/MP" # Multi-processor compilation
     "/permissive-" # Conform to the C++ standard
-    "/std:c++17" # Specify the C++ standard to use
+    "/std:c++latest" # Specify the C++ standard to use
     "/Zo" # Generate enhanced debugging information for optimized code in non-debug builds
     "/sdl" # Enable additional security checks
     "/WX" # Treat all warnings as errors
@@ -34,6 +34,8 @@ SET(CXX_FLAGS_LIST
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /O2")
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS${buildType}} /nologo")
   add_definitions(-D_WIN32_WINNT=0x600)
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF" )
 
 find_program(CONAN_PROGRAM "conan")
 IF (NOT CONAN_PROGRAM)
